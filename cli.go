@@ -50,7 +50,7 @@ func (c *CLI) Run(args []string) (exit int) {
 	}
 
 	source := flags.Arg(0)
-	if err := Run(source, *directory, *verbose); err != nil {
+	if err := Run(source, *directory, c.ErrStream, *verbose); err != nil {
 		fmt.Fprintf(c.ErrStream, "Error! %v\n", err)
 		return exitNG
 	}

@@ -8,17 +8,26 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/mholt/archiver/v3"
 )
 
 type Runner struct {
-	Origin, DestDir, tmpdir, download, extracted string
+	Origin     string
+	DestDir    string
+	Output     io.Writer
+	tmpdir     string
+	download   string
+	extractDir string
+	extracted  bool
 }
 
 var defaultRunner Runner
 
-func Run(src, dir string, verbose bool) (err error) {
+func Run(src, dir string, outs io.Writer, verbose bool) (err error) {
 	defaultRunner.Origin = src
 	defaultRunner.DestDir = dir
+	defaultRunner.Output = outs
 	return defaultRunner.Run(verbose)
 }
 
@@ -27,7 +36,9 @@ func (r *Runner) Run(verbose bool) (err error) {
 		return err
 	}
 	defer os.RemoveAll(r.tmpdir)
-	// TODO: detect filetype
+	if err = r.extract(verbose); err != nil {
+		return err
+	}
 	if err = r.locate(verbose); err != nil {
 		return err
 	}
@@ -74,14 +85,64 @@ func (r *Runner) fetch(verbose bool) (err error) {
 }
 
 func (r *Runner) extract(verbose bool) (err error) {
-	// TODO: implement
-	return err
+	r.extracted = false
+	uai, _err := archiver.ByExtension(r.download)
+	if _err != nil {
+		fmt.Fprintf(r.Output, "[Notice] Unarchiver can't be determined. %s\n", _err)
+		return nil
+	}
+
+	unarchiver, ok := uai.(archiver.Unarchiver)
+	if !ok {
+		err = fmt.Errorf(
+			"Failed to determine Unarchiver. Probably file format is wrong. File: %s, Type: %T",
+			r.download, uai)
+		return err
+	}
+
+	r.extractDir = filepath.Join(r.tmpdir, "ext")
+	os.Mkdir(r.extractDir, 0755)
+	if _err = unarchiver.Unarchive(r.download, r.extractDir); _err != nil {
+		return errorwf(_err, "Failed to unarchive: %s", r.download)
+	}
+
+	r.extracted = true
+	return nil
 }
 
 func (r *Runner) locate(verbose bool) (err error) {
-	dest := filepath.Join(r.DestDir, filepath.Base(r.download))
-	if _err := os.Rename(r.download, dest); _err != nil {
-		return errorwf(_err, "Failed to locate file: %s", dest)
+	if !r.extracted {
+		dest := filepath.Join(r.DestDir, filepath.Base(r.download))
+		if _err := os.Rename(r.download, dest); _err != nil {
+			return errorwf(_err, "Failed to locate file: %s", dest)
+		}
+		fi, _err := os.Stat(dest)
+		if _err != nil {
+			return errorwf(_err, "Failed to get file info: %s", dest)
+		}
+		// Assume downloaded binary is executable
+		if _err = os.Chmod(dest, fi.Mode()|0111); _err != nil {
+			return errorwf(_err, "Failed to change file mode: %s", dest)
+		}
+		return nil
 	}
-	return err
+
+	// Walk through the extracted directory to find and locate executable files
+	return filepath.Walk(r.extractDir, func(path string, info os.FileInfo, problem error) error {
+		if problem != nil || info.IsDir() {
+			return problem
+		}
+		if isExecutable(info.Mode()) {
+			dest := filepath.Join(r.DestDir, info.Name())
+			if _err := os.Rename(path, dest); _err != nil {
+				return errorwf(_err, "Failed to locate file: %s", dest)
+			}
+		}
+		return nil
+	})
+}
+
+// TODO: Support Windows
+func isExecutable(mode os.FileMode) bool {
+	return mode&0111 != 0
 }
