@@ -1,10 +1,11 @@
-package dlx
+package client
 
 import (
 	"fmt"
 	"io"
 	"path/filepath"
 
+	"github.com/progrhyme/dlx"
 	"github.com/progrhyme/dlx/internal/logs"
 	"github.com/spf13/pflag"
 )
@@ -42,7 +43,7 @@ func (c *CLI) Run(args []string) (exit int) {
 		flags.Usage()
 		return exitOK
 	} else if *version {
-		fmt.Fprintf(c.OutStream, "Version: %s\n", Version)
+		fmt.Fprintf(c.OutStream, "Version: %s\n", dlx.Version)
 		return exitOK
 	}
 

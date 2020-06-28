@@ -1,4 +1,4 @@
-package dlx
+package client
 
 type logger interface {
 	Printf(string, ...interface{})

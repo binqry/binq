@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"github.com/progrhyme/dlx"
+	"github.com/progrhyme/dlx/client"
 )
 
 func main() {
-	os.Exit(dlx.NewCLI(os.Stdout, os.Stderr).Run(os.Args))
+	os.Exit(client.NewCLI(os.Stdout, os.Stderr).Run(os.Args))
 }

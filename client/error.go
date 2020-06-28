@@ -1,4 +1,4 @@
-package dlx
+package client
 
 import "fmt"
 

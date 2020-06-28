@@ -1,4 +1,4 @@
-package dlx
+package client
 
 import (
 	"fmt"
@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 
 	"github.com/mholt/archiver/v3"
+	"github.com/progrhyme/dlx"
 	"github.com/progrhyme/dlx/internal/logs"
 )
 
@@ -53,7 +54,7 @@ func (r *Runner) fetch() (err error) {
 	if _err != nil {
 		return errorwf(_err, "Failed to create HTTP request")
 	}
-	req.Header.Set("User-Agent", fmt.Sprintf("dlx/%s", Version))
+	req.Header.Set("User-Agent", fmt.Sprintf("dlx/%s", dlx.Version))
 	r.Logger.Printf("GET %s", r.Origin)
 	res, _err := http.DefaultClient.Do(req)
 	if _err != nil {
