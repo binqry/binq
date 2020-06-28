@@ -5,6 +5,7 @@ import (
 	"io"
 	"path/filepath"
 
+	"github.com/progrhyme/dlx/internal/logs"
 	"github.com/spf13/pflag"
 )
 
@@ -28,6 +29,7 @@ func (c *CLI) Run(args []string) (exit int) {
 	help := flags.BoolP("help", "h", false, "show help")
 	version := flags.BoolP("version", "V", false, "show version")
 	verbose := flags.BoolP("verbose", "v", false, "verbose output")
+	debug := flags.Bool("debug", false, "show debug messages")
 	directory := flags.StringP("directory", "d", "", "output directory")
 	flags.Usage = func() { c.usage(flags, prog) }
 	if err := flags.Parse(args[1:]); err != nil {
@@ -50,7 +52,13 @@ func (c *CLI) Run(args []string) (exit int) {
 	}
 
 	source := flags.Arg(0)
-	if err := Run(source, *directory, c.ErrStream, *verbose); err != nil {
+	logLevel := logs.Notice
+	if *debug {
+		logLevel = logs.Debug
+	} else if *verbose {
+		logLevel = logs.Info
+	}
+	if err := Run(source, *directory, c.ErrStream, logLevel); err != nil {
 		fmt.Fprintf(c.ErrStream, "Error! %v\n", err)
 		return exitNG
 	}
