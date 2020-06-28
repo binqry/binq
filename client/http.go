@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/progrhyme/dlx"
-	"github.com/progrhyme/dlx/internal/erron"
+	"github.com/progrhyme/binq"
+	"github.com/progrhyme/binq/internal/erron"
 )
 
 var (
@@ -43,7 +43,7 @@ func newHttpGetRequest(url string, headers map[string]string) (req *http.Request
 	if _err != nil {
 		return req, erron.Errorwf(_err, "Failed to create HTTP request")
 	}
-	req.Header.Set("User-Agent", fmt.Sprintf("dlx/%s", dlx.Version))
+	req.Header.Set("User-Agent", fmt.Sprintf("binq/%s", binq.Version))
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}

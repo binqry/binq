@@ -5,7 +5,7 @@ import (
 	"html/template"
 	"strings"
 
-	"github.com/progrhyme/dlx/internal/erron"
+	"github.com/progrhyme/binq/internal/erron"
 )
 
 // Item wraps itemProps which corresponds to JSON structure of item data

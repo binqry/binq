@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/progrhyme/dlx/client"
+	"github.com/progrhyme/binq/client"
 )
 
 func main() {

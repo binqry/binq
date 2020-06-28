@@ -5,8 +5,8 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/progrhyme/dlx"
-	"github.com/progrhyme/dlx/internal/logs"
+	"github.com/progrhyme/binq"
+	"github.com/progrhyme/binq/internal/logs"
 	"github.com/spf13/pflag"
 )
 
@@ -44,7 +44,7 @@ func (c *CLI) Run(args []string) (exit int) {
 		flags.Usage()
 		return exitOK
 	} else if *version {
-		fmt.Fprintf(c.OutStream, "Version: %s\n", dlx.Version)
+		fmt.Fprintf(c.OutStream, "Version: %s\n", binq.Version)
 		return exitOK
 	}
 

@@ -13,10 +13,10 @@ import (
 	"strings"
 
 	"github.com/mholt/archiver/v3"
-	"github.com/progrhyme/dlx"
-	"github.com/progrhyme/dlx/internal/erron"
-	"github.com/progrhyme/dlx/internal/logs"
-	"github.com/progrhyme/dlx/schema"
+	"github.com/progrhyme/binq"
+	"github.com/progrhyme/binq/internal/erron"
+	"github.com/progrhyme/binq/internal/logs"
+	"github.com/progrhyme/binq/schema"
 )
 
 type Runner struct {
@@ -54,7 +54,7 @@ func Run(opt runOpts) (err error) {
 	var urlStr string
 	if opt.server != "" {
 		urlStr = opt.server
-	} else if server := os.Getenv(dlx.EnvKeyServer); server != "" {
+	} else if server := os.Getenv(binq.EnvKeyServer); server != "" {
 		urlStr = server
 	}
 	if urlStr != "" {
@@ -163,7 +163,7 @@ func (r *Runner) fetch() (err error) {
 	if res.StatusCode != 200 {
 		return fmt.Errorf("HTTP response is not OK. Code: %d, URL: %s", res.StatusCode, r.Source)
 	}
-	r.tmpdir, _err = ioutil.TempDir(os.TempDir(), "dlx.*")
+	r.tmpdir, _err = ioutil.TempDir(os.TempDir(), "binq.*")
 	if _err != nil {
 		return erron.Errorwf(_err, "Failed to create tempdir")
 	}
