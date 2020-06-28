@@ -1,6 +1,7 @@
 # binq
 
-Download executable programs via HTTP and extract them when compressed.
+Download items via HTTP and extract them when compressed.  
+Mainly focuses on executable programs distributed on the internet.
 
 # Install
 
@@ -9,28 +10,28 @@ Choose one of below methods:
 - Download from GitHub releases
 - go get (go command is required)
 
-Descriptions for each method follow.
+Description for each method follows.
 
-## Download from Releases
+## Download from GitHub Releases
 
 Download latest binary from [GitHub Releases](https://github.com/progrhyme/binq/releases)
 and put it under one directory in `$PATH` entries.
 
-Typical commands to achieve this are below:
+Typical commands to achieve this are following:
 
 ```sh
 bin=/usr/local/bin  # Change to your favorite path
 version=0.1.0       # Make sure this is the latest
 os=darwin           # or "linux" is supported
 tmpfile=$(mktemp)
-curl -Lo $tmpfile "https://github.com/progrhyme/binq/releases/download/v${version}/binq_${version}_${os}_x86_64"
+curl -Lo $tmpfile "https://github.com/progrhyme/binq/releases/download/v${version}/binq_${version}_${os}_amd64.zip"
 unzip -d $bin $tmpfile
 rm $tmpfile
 ```
 
 ## go get
 
-Just execute:
+Just run this:
 
 ```sh
 go get github.com/progrhyme/binq
@@ -71,11 +72,13 @@ binq jq -d path/to/bin -f jq
 
 # Binq Index Server
 
-Binq index server is the database of programs and their URLs for `binq`.  
-When program identifier is specified instead of full URL, `binq` refers to index server to find the
-download URL.
+`binq` refers to an index server to fetch meta data of an item when its identifier is specified
+instead of full URL.  
+We call it **Binq Index Server**.
 
-It just returns appropriate JSON file for each program.
+It contains the database of downloadable items with their URLs for `binq`.  
+When `binq` send a request to the server, it responds a JSON data which contains information about
+the item.
 
 A live example of index server is https://progrhy.me/binq-index/ .  
 This is just a static site of GitHub Pages, whose source is https://github.com/progrhyme/binq-index/tree/gh-pages .
