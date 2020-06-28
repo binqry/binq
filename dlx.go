@@ -16,6 +16,7 @@ import (
 type Runner struct {
 	Origin     string
 	DestDir    string
+	DestFile   string
 	Logger     logger
 	tmpdir     string
 	download   string
@@ -25,9 +26,10 @@ type Runner struct {
 
 var defaultRunner Runner
 
-func Run(src, dir string, outs io.Writer, lv logs.Level) (err error) {
+func Run(src, dir, file string, outs io.Writer, lv logs.Level) (err error) {
 	defaultRunner.Origin = src
 	defaultRunner.DestDir = dir
+	defaultRunner.DestFile = file
 	defaultRunner.Logger = logs.New(outs, lv, 0)
 	return defaultRunner.Run()
 }
@@ -116,7 +118,12 @@ func (r *Runner) extract() (err error) {
 
 func (r *Runner) locate() (err error) {
 	if !r.extracted {
-		dest := filepath.Join(r.DestDir, filepath.Base(r.download))
+		var dest string
+		if r.DestFile == "" {
+			dest = filepath.Join(r.DestDir, filepath.Base(r.download))
+		} else {
+			dest = filepath.Join(r.DestDir, r.DestFile)
+		}
 		if _err := os.Rename(r.download, dest); _err != nil {
 			return errorwf(_err, "Failed to locate file: %s", dest)
 		}
@@ -133,7 +140,7 @@ func (r *Runner) locate() (err error) {
 	}
 
 	// Walk through the extracted directory to find and locate executable files
-	installed := 0
+	installed := []string{}
 	err = filepath.Walk(r.extractDir, func(path string, info os.FileInfo, problem error) error {
 		r.Logger.Debugf("Walking in archive: %s", path)
 		if problem != nil || info.IsDir() {
@@ -145,12 +152,23 @@ func (r *Runner) locate() (err error) {
 				return errorwf(_err, "Failed to locate file: %s", dest)
 			}
 			r.Logger.Printf("Installed %s", dest)
-			installed++
+			installed = append(installed, dest)
 		}
 		return nil
 	})
-	if installed == 0 {
+	switch len(installed) {
+	case 0:
 		r.Logger.Warnf("Archive has no executables. None is installed")
+	case 1:
+		if r.DestFile != "" && r.DestFile != filepath.Base(installed[0]) {
+			dest := filepath.Join(r.DestDir, r.DestFile)
+			if _err := os.Rename(installed[0], dest); _err != nil {
+				return errorwf(_err, "Failed to locate file: %s", dest)
+			}
+			r.Logger.Printf("Moved %s to %s", installed[0], dest)
+		}
+	default:
+		// Do nothing
 	}
 
 	return err
