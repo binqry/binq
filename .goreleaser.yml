@@ -1,0 +1,23 @@
+# See http://goreleaser.com about this file
+before:
+  hooks:
+    - go mod download
+builds:
+- main: ./cmd/binq/main.go
+  goos:
+  - linux
+  - darwin
+  goarch:
+  - amd64
+  env:
+  - CGO_ENABLED=0
+archives:
+- format: zip
+  files:
+    - nothing*
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  skip: true
