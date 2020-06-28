@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/progrhyme/dlx"
+	"github.com/progrhyme/dlx/internal/erron"
 )
 
 // DefaultHTTPTimeout represents default timeout period of HTTP requests.
@@ -37,7 +38,7 @@ func newHttpClient(timeout time.Duration) (hc *http.Client) {
 func newHttpGetRequest(url string, headers map[string]string) (req *http.Request, err error) {
 	req, _err := http.NewRequest(http.MethodGet, url, nil)
 	if _err != nil {
-		return req, errorwf(_err, "Failed to create HTTP request")
+		return req, erron.Errorwf(_err, "Failed to create HTTP request")
 	}
 	req.Header.Set("User-Agent", fmt.Sprintf("dlx/%s", dlx.Version))
 	for k, v := range headers {

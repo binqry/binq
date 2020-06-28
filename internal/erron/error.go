@@ -1,4 +1,6 @@
-package client
+// Package erron treats errors
+// The name "erron" means the word "erroneuos"
+package erron
 
 import "fmt"
 
@@ -15,6 +17,6 @@ func (e *Error) Unwrap() (included error) {
 	return e.err
 }
 
-func errorwf(err error, msg string, a ...interface{}) (wrapped error) {
+func Errorwf(err error, msg string, a ...interface{}) (wrapped error) {
 	return &Error{msg: fmt.Sprintf(msg, a...), err: err}
 }
