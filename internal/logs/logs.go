@@ -7,6 +7,16 @@ import (
 	"strings"
 )
 
+type Logging interface {
+	Printf(string, ...interface{})
+	Tracef(string, ...interface{})
+	Debugf(string, ...interface{})
+	Infof(string, ...interface{})
+	Noticef(string, ...interface{})
+	Warnf(string, ...interface{})
+	Errorf(string, ...interface{})
+}
+
 type Logger struct {
 	log   *log.Logger
 	level Level

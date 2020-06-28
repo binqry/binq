@@ -18,7 +18,7 @@ type Runner struct {
 	Origin     string
 	DestDir    string
 	DestFile   string
-	Logger     logger
+	Logger     logs.Logging
 	tmpdir     string
 	download   string
 	extractDir string
