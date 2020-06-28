@@ -5,9 +5,11 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/mholt/archiver/v3"
 	"github.com/progrhyme/dlx"
@@ -19,25 +21,54 @@ type Runner struct {
 	DestDir    string
 	DestFile   string
 	Logger     logs.Logging
+	ServerURL  *url.URL
 	httpClient *http.Client
+	sourceURL  string
 	tmpdir     string
 	download   string
 	extractDir string
 	extracted  bool
 }
 
+type runOpts struct {
+	source   string
+	destDir  string
+	destFile string
+	outs     io.Writer
+	level    logs.Level
+	server   string
+}
+
 var defaultRunner Runner
 
-func Run(src, dir, file string, outs io.Writer, lv logs.Level) (err error) {
-	defaultRunner.Source = src
-	defaultRunner.DestDir = dir
-	defaultRunner.DestFile = file
-	defaultRunner.Logger = logs.New(outs, lv, 0)
+func Run(opt runOpts) (err error) {
+	defaultRunner.Source = opt.source
+	defaultRunner.DestDir = opt.destDir
+	defaultRunner.DestFile = opt.destFile
+	defaultRunner.Logger = logs.New(opt.outs, opt.level, 0)
 	defaultRunner.httpClient = newHttpClient(DefaultHTTPTimeout)
+
+	var urlStr string
+	if opt.server != "" {
+		urlStr = opt.server
+	} else if server := os.Getenv(dlx.EnvKeyServer); server != "" {
+		urlStr = server
+	}
+	if urlStr != "" {
+		uri, _err := url.Parse(urlStr)
+		if _err != nil {
+			return errorwf(_err, "Failed to parse server URL: %s", urlStr)
+		}
+		defaultRunner.ServerURL = uri
+	}
+
 	return defaultRunner.Run()
 }
 
 func (r *Runner) Run() (err error) {
+	if err = r.prefetch(); err != nil {
+		return err
+	}
 	if err = r.fetch(); err != nil {
 		return err
 	}
@@ -51,12 +82,53 @@ func (r *Runner) Run() (err error) {
 	return nil
 }
 
-func (r *Runner) fetch() (err error) {
-	req, _err := http.NewRequest(http.MethodGet, r.Source, nil)
-	if _err != nil {
-		return errorwf(_err, "Failed to create HTTP request")
+// prefetch query metadata for item info to fetch
+func (r *Runner) prefetch() (err error) {
+	if strings.HasPrefix(r.Source, "http") {
+		r.sourceURL = r.Source
+		return nil
 	}
-	req.Header.Set("User-Agent", fmt.Sprintf("dlx/%s", dlx.Version))
+	if r.ServerURL == nil {
+		return fmt.Errorf("No server is configured. Can't deal with source: %s", r.Source)
+	}
+	// Copy r.ServerURL
+	urlItem, _err := url.Parse(r.ServerURL.String())
+	if _err != nil {
+		// Unexpected case
+		return errorwf(_err, "Failed to parse server URL: %v", r.ServerURL)
+	}
+	urlItem.Path = path.Join(urlItem.Path, r.Source)
+
+	headers := make(map[string]string)
+	headers["Accept"] = "application/json"
+	req, err := newHttpGetRequest(urlItem.String(), headers)
+	if err != nil {
+		return err
+	}
+	r.Logger.Infof("GET %s", urlItem.String())
+	// TODO: change timeout
+	res, _err := r.httpClient.Do(req)
+	if _err != nil {
+		return errorwf(_err, "Failed to execute HTTP request")
+	}
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		return fmt.Errorf("HTTP response is not OK. Code: %d, URL: %s", res.StatusCode, r.Source)
+	}
+
+	// TODO: decode response
+
+	return err
+}
+
+func (r *Runner) fetch() (err error) {
+	if r.sourceURL == "" {
+		return fmt.Errorf("Can't fetch because sourceURL is not set. Runner: %+v", r)
+	}
+	req, err := newHttpGetRequest(r.sourceURL, map[string]string{})
+	if err != nil {
+		return err
+	}
 	r.Logger.Printf("GET %s", r.Source)
 	res, _err := r.httpClient.Do(req)
 	if _err != nil {

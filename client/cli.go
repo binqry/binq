@@ -33,6 +33,7 @@ func (c *CLI) Run(args []string) (exit int) {
 	debug := flags.Bool("debug", false, "show debug messages")
 	directory := flags.StringP("directory", "d", "", "output directory")
 	file := flags.StringP("file", "f", "", "output file name")
+	server := flags.StringP("server", "s", "", "index server URL")
 	flags.Usage = func() { c.usage(flags, prog) }
 	if err := flags.Parse(args[1:]); err != nil {
 		fmt.Fprintf(c.ErrStream, "Error! Parsing arguments failed. %s\n", err)
@@ -60,7 +61,15 @@ func (c *CLI) Run(args []string) (exit int) {
 	} else if *verbose {
 		logLevel = logs.Info
 	}
-	if err := Run(source, *directory, *file, c.ErrStream, logLevel); err != nil {
+	opts := runOpts{
+		source:   source,
+		destDir:  *directory,
+		destFile: *file,
+		outs:     c.ErrStream,
+		level:    logLevel,
+		server:   *server,
+	}
+	if err := Run(opts); err != nil {
 		fmt.Fprintf(c.ErrStream, "Error! %v\n", err)
 		return exitNG
 	}
