@@ -15,7 +15,7 @@ import (
 )
 
 type Runner struct {
-	Origin     string
+	Source     string
 	DestDir    string
 	DestFile   string
 	Logger     logs.Logging
@@ -28,7 +28,7 @@ type Runner struct {
 var defaultRunner Runner
 
 func Run(src, dir, file string, outs io.Writer, lv logs.Level) (err error) {
-	defaultRunner.Origin = src
+	defaultRunner.Source = src
 	defaultRunner.DestDir = dir
 	defaultRunner.DestFile = file
 	defaultRunner.Logger = logs.New(outs, lv, 0)
@@ -50,19 +50,19 @@ func (r *Runner) Run() (err error) {
 }
 
 func (r *Runner) fetch() (err error) {
-	req, _err := http.NewRequest(http.MethodGet, r.Origin, nil)
+	req, _err := http.NewRequest(http.MethodGet, r.Source, nil)
 	if _err != nil {
 		return errorwf(_err, "Failed to create HTTP request")
 	}
 	req.Header.Set("User-Agent", fmt.Sprintf("dlx/%s", dlx.Version))
-	r.Logger.Printf("GET %s", r.Origin)
+	r.Logger.Printf("GET %s", r.Source)
 	res, _err := http.DefaultClient.Do(req)
 	if _err != nil {
 		return errorwf(_err, "Failed to execute HTTP request")
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		return fmt.Errorf("HTTP response is not OK. Code: %d, URL: %s", res.StatusCode, r.Origin)
+		return fmt.Errorf("HTTP response is not OK. Code: %d, URL: %s", res.StatusCode, r.Source)
 	}
 	r.tmpdir, _err = ioutil.TempDir(os.TempDir(), "dlx.*")
 	if _err != nil {
@@ -74,7 +74,7 @@ func (r *Runner) fetch() (err error) {
 		}
 	}()
 
-	base := path.Base(r.Origin)
+	base := path.Base(r.Source)
 	r.download = filepath.Join(r.tmpdir, base)
 	dl, _err := os.Create(r.download)
 	if _err != nil {
