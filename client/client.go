@@ -9,12 +9,14 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/mholt/archiver/v3"
 	"github.com/progrhyme/dlx"
 	"github.com/progrhyme/dlx/internal/erron"
 	"github.com/progrhyme/dlx/internal/logs"
+	"github.com/progrhyme/dlx/schema"
 )
 
 type Runner struct {
@@ -67,8 +69,8 @@ func Run(opt runOpts) (err error) {
 }
 
 func (r *Runner) Run() (err error) {
-	if err = r.prefetch(); err != nil {
-		return err
+	if _err := r.prefetch(); _err != nil {
+		return erron.Errorwf(_err, "Can't fetch item data. Target: %s, Server: %s", r.Source, r.ServerURL)
 	}
 	if err = r.fetch(); err != nil {
 		return err
@@ -107,30 +109,52 @@ func (r *Runner) prefetch() (err error) {
 		return err
 	}
 	r.Logger.Infof("GET %s", urlItem.String())
-	// TODO: change timeout
-	res, _err := r.httpClient.Do(req)
+
+	// Use different timeout for index server
+	hc := newHttpClient(httpTimeoutToQueryIndex)
+	res, _err := hc.Do(req)
 	if _err != nil {
 		return erron.Errorwf(_err, "Failed to execute HTTP request")
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		return fmt.Errorf("HTTP response is not OK. Code: %d, URL: %s", res.StatusCode, r.Source)
+		return fmt.Errorf("HTTP response is not OK. Code: %d, URL: %s", res.StatusCode, urlItem.String())
 	}
 
-	// TODO: decode response
+	var b strings.Builder
+	_, _err = io.Copy(&b, res.Body)
+	if _err != nil {
+		return erron.Errorwf(_err, "Failed to read HTTP response")
+	}
+
+	item, err := schema.DecodeItemJSON([]byte(b.String()))
+	if err != nil {
+		return err
+	}
+	r.Logger.Debugf("Decoded JSON: %+v", item)
+
+	srcURL, err := item.GetLatestURL(schema.ItemURLParam{OS: runtime.GOOS, Arch: runtime.GOARCH})
+	if err != nil {
+		return err
+	}
+	if srcURL == "" {
+		return fmt.Errorf("Can't get source URL from JSON")
+	}
+
+	r.sourceURL = srcURL
 
 	return err
 }
 
 func (r *Runner) fetch() (err error) {
 	if r.sourceURL == "" {
-		return fmt.Errorf("Can't fetch because sourceURL is not set. Runner: %+v", r)
+		return fmt.Errorf("Can't fetch because sourceURL is not set. Source: %s", r.Source)
 	}
 	req, err := newHttpGetRequest(r.sourceURL, map[string]string{})
 	if err != nil {
 		return err
 	}
-	r.Logger.Printf("GET %s", r.Source)
+	r.Logger.Printf("GET %s", r.sourceURL)
 	res, _err := r.httpClient.Do(req)
 	if _err != nil {
 		return erron.Errorwf(_err, "Failed to execute HTTP request")
@@ -149,7 +173,7 @@ func (r *Runner) fetch() (err error) {
 		}
 	}()
 
-	base := path.Base(r.Source)
+	base := path.Base(r.sourceURL)
 	r.download = filepath.Join(r.tmpdir, base)
 	dl, _err := os.Create(r.download)
 	if _err != nil {

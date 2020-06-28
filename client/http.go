@@ -10,9 +10,12 @@ import (
 	"github.com/progrhyme/dlx/internal/erron"
 )
 
-// DefaultHTTPTimeout represents default timeout period of HTTP requests.
-// See init.go for default value
-var DefaultHTTPTimeout time.Duration
+var (
+	// DefaultHTTPTimeout represents default timeout period of HTTP requests.
+	// See init.go for default value
+	DefaultHTTPTimeout      time.Duration
+	httpTimeoutToQueryIndex time.Duration
+)
 
 const undefinedHTTPTimeout = -1
 
