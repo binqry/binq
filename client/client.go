@@ -19,6 +19,7 @@ type Runner struct {
 	DestDir    string
 	DestFile   string
 	Logger     logs.Logging
+	httpClient *http.Client
 	tmpdir     string
 	download   string
 	extractDir string
@@ -32,6 +33,7 @@ func Run(src, dir, file string, outs io.Writer, lv logs.Level) (err error) {
 	defaultRunner.DestDir = dir
 	defaultRunner.DestFile = file
 	defaultRunner.Logger = logs.New(outs, lv, 0)
+	defaultRunner.httpClient = newHttpClient(DefaultHTTPTimeout)
 	return defaultRunner.Run()
 }
 
@@ -56,7 +58,7 @@ func (r *Runner) fetch() (err error) {
 	}
 	req.Header.Set("User-Agent", fmt.Sprintf("dlx/%s", dlx.Version))
 	r.Logger.Printf("GET %s", r.Source)
-	res, _err := http.DefaultClient.Do(req)
+	res, _err := r.httpClient.Do(req)
 	if _err != nil {
 		return errorwf(_err, "Failed to execute HTTP request")
 	}
