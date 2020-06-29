@@ -2,6 +2,7 @@ package schema
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"strings"
 
@@ -10,7 +11,7 @@ import (
 
 // Item wraps itemProps which corresponds to JSON structure of item data
 type Item struct {
-	itemProps
+	*itemProps
 }
 
 type ItemRevision struct {
@@ -52,8 +53,12 @@ func DecodeItemJSON(b []byte) (item *Item, err error) {
 	if _err := json.Unmarshal(b, &i); _err != nil {
 		return item, erron.Errorwf(_err, "Failed to unmarshal JSON: %s", b)
 	}
-	item = &Item{itemProps: i}
+	item = &Item{itemProps: &i}
 	return item, err
+}
+
+func (i *Item) String() string {
+	return fmt.Sprintf("%+v", *i.itemProps)
 }
 
 func (i *Item) GetLatestURL(param ItemURLParam) (url string, err error) {

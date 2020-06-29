@@ -2,6 +2,7 @@ package schema
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/progrhyme/binq/internal/erron"
 )
@@ -12,7 +13,7 @@ type IndiceItem struct {
 }
 
 type Index struct {
-	indexProps
+	*indexProps
 }
 
 type indexProps struct {
@@ -24,8 +25,12 @@ func DecodeIndexJSON(b []byte) (index *Index, err error) {
 	if _err := json.Unmarshal(b, &ip); _err != nil {
 		return index, erron.Errorwf(_err, "Failed to unmarshal JSON: %s", b)
 	}
-	index = &Index{indexProps: ip}
+	index = &Index{indexProps: &ip}
 	return index, err
+}
+
+func (idx *Index) String() string {
+	return fmt.Sprintf("%+v", *idx.indexProps)
 }
 
 func (idx *Index) Find(name string) (indice *IndiceItem) {
