@@ -66,7 +66,7 @@ binq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 \
   -d path/to/bin -f jq
 
 # With index server
-binq -s https://progrhy.me/binq-index github.com/peco/peco -d path/to/bin
+binq -s https://progrhy.me/binq-index peco -d path/to/bin
 export BINQ_SERVER=https://progrhy.me/binq-index
 binq jq -d path/to/bin -f jq
 ```
