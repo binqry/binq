@@ -63,6 +63,9 @@ func (c *CLI) Run(args []string) (exit int) {
 	if *noExec {
 		mode = mode ^ ModeExecutable
 	}
+	if mode == 0 {
+		mode = ModeDLOnly
+	}
 
 	source := flags.Arg(0)
 
