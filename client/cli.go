@@ -63,6 +63,9 @@ func (c *CLI) Run(args []string) (exit int) {
 	if *noExec {
 		mode = mode ^ ModeExecutable
 	}
+	if mode == 0 {
+		mode = ModeDLOnly
+	}
 
 	source := flags.Arg(0)
 
@@ -72,14 +75,14 @@ func (c *CLI) Run(args []string) (exit int) {
 	} else if *verbose {
 		logLevel = logs.Info
 	}
-	opts := runOpts{
-		mode:     mode,
-		source:   source,
-		destDir:  *directory,
-		destFile: *file,
-		outs:     c.ErrStream,
-		level:    logLevel,
-		server:   *server,
+	opts := RunOption{
+		Mode:      mode,
+		Source:    source,
+		DestDir:   *directory,
+		DestFile:  *file,
+		Output:    c.ErrStream,
+		LogLevel:  logLevel,
+		ServerURL: *server,
 	}
 	if err := Run(opts); err != nil {
 		fmt.Fprintf(c.ErrStream, "Error! %v\n", err)

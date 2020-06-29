@@ -9,14 +9,12 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/mholt/archiver/v3"
 	"github.com/progrhyme/binq"
 	"github.com/progrhyme/binq/internal/erron"
 	"github.com/progrhyme/binq/internal/logs"
-	"github.com/progrhyme/binq/schema"
 )
 
 type Mode int
@@ -43,33 +41,35 @@ type Runner struct {
 	extracted  bool
 }
 
-type runOpts struct {
-	mode     Mode
-	source   string
-	destDir  string
-	destFile string
-	outs     io.Writer
-	level    logs.Level
-	server   string
+type RunOption struct {
+	Mode      Mode
+	Source    string
+	DestDir   string
+	DestFile  string
+	Output    io.Writer
+	LogLevel  logs.Level
+	ServerURL string
 }
 
 var defaultRunner Runner
 
-func Run(opt runOpts) (err error) {
-	defaultRunner.Source = opt.source
-	defaultRunner.DestDir = opt.destDir
-	defaultRunner.DestFile = opt.destFile
-	defaultRunner.Logger = logs.New(opt.outs, opt.level, 0)
-	defaultRunner.httpClient = newHttpClient(DefaultHTTPTimeout)
-	if opt.mode == 0 {
+func Run(opt RunOption) (err error) {
+	defaultRunner = Runner{
+		Source:     opt.Source,
+		DestDir:    opt.DestDir,
+		DestFile:   opt.DestFile,
+		Logger:     logs.New(opt.Output, opt.LogLevel, 0),
+		httpClient: newHttpClient(DefaultHTTPTimeout),
+	}
+	if opt.Mode == 0 {
 		defaultRunner.Mode = ModeDefault
 	} else {
-		defaultRunner.Mode = opt.mode
+		defaultRunner.Mode = opt.Mode
 	}
 
 	var urlStr string
-	if opt.server != "" {
-		urlStr = opt.server
+	if opt.ServerURL != "" {
+		urlStr = opt.ServerURL
 	} else if server := os.Getenv(binq.EnvKeyServer); server != "" {
 		urlStr = server
 	}
@@ -101,67 +101,6 @@ func (r *Runner) Run() (err error) {
 		return err
 	}
 	return nil
-}
-
-// prefetch query metadata for item info to fetch
-func (r *Runner) prefetch() (err error) {
-	if strings.HasPrefix(r.Source, "http") {
-		r.sourceURL = r.Source
-		return nil
-	}
-	if r.ServerURL == nil {
-		return fmt.Errorf("No server is configured. Can't deal with source: %s", r.Source)
-	}
-	// Copy r.ServerURL
-	urlItem, _err := url.Parse(r.ServerURL.String())
-	if _err != nil {
-		// Unexpected case
-		return erron.Errorwf(_err, "Failed to parse server URL: %v", r.ServerURL)
-	}
-	urlItem.Path = path.Join(urlItem.Path, r.Source)
-
-	headers := make(map[string]string)
-	headers["Accept"] = "application/json"
-	req, err := newHttpGetRequest(urlItem.String(), headers)
-	if err != nil {
-		return err
-	}
-	r.Logger.Infof("GET %s", urlItem.String())
-
-	// Use different timeout for index server
-	hc := newHttpClient(httpTimeoutToQueryIndex)
-	res, _err := hc.Do(req)
-	if _err != nil {
-		return erron.Errorwf(_err, "Failed to execute HTTP request")
-	}
-	defer res.Body.Close()
-	if res.StatusCode != 200 {
-		return fmt.Errorf("HTTP response is not OK. Code: %d, URL: %s", res.StatusCode, urlItem.String())
-	}
-
-	var b strings.Builder
-	_, _err = io.Copy(&b, res.Body)
-	if _err != nil {
-		return erron.Errorwf(_err, "Failed to read HTTP response")
-	}
-
-	item, err := schema.DecodeItemJSON([]byte(b.String()))
-	if err != nil {
-		return err
-	}
-	r.Logger.Debugf("Decoded JSON: %+v", item)
-
-	srcURL, err := item.GetLatestURL(schema.ItemURLParam{OS: runtime.GOOS, Arch: runtime.GOARCH})
-	if err != nil {
-		return err
-	}
-	if srcURL == "" {
-		return fmt.Errorf("Can't get source URL from JSON")
-	}
-
-	r.sourceURL = srcURL
-
-	return err
 }
 
 func (r *Runner) fetch() (err error) {
@@ -216,7 +155,8 @@ func (r *Runner) extract() (err error) {
 	r.extracted = false
 	uai, _err := archiver.ByExtension(r.download)
 	if _err != nil {
-		r.Logger.Noticef("Unarchiver can't be determined. %s", _err)
+		r.Logger.Debugf("Unarchiver can't be determined. %s", _err)
+		r.Logger.Noticef("Skip extraction")
 		return nil
 	}
 
