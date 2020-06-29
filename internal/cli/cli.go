@@ -1,4 +1,4 @@
-package client
+package cli
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/progrhyme/binq"
+	"github.com/progrhyme/binq/client"
 	"github.com/progrhyme/binq/internal/logs"
 	"github.com/spf13/pflag"
 )
@@ -56,15 +57,15 @@ func (c *CLI) Run(args []string) (exit int) {
 		return exitNG
 	}
 
-	mode := ModeDefault
+	mode := client.ModeDefault
 	if *noExtract {
-		mode = mode ^ ModeExtract
+		mode = mode ^ client.ModeExtract
 	}
 	if *noExec {
-		mode = mode ^ ModeExecutable
+		mode = mode ^ client.ModeExecutable
 	}
 	if mode == 0 {
-		mode = ModeDLOnly
+		mode = client.ModeDLOnly
 	}
 
 	source := flags.Arg(0)
@@ -75,7 +76,7 @@ func (c *CLI) Run(args []string) (exit int) {
 	} else if *verbose {
 		logLevel = logs.Info
 	}
-	opts := RunOption{
+	opts := client.RunOption{
 		Mode:      mode,
 		Source:    source,
 		DestDir:   *directory,
@@ -84,7 +85,7 @@ func (c *CLI) Run(args []string) (exit int) {
 		LogLevel:  logLevel,
 		ServerURL: *server,
 	}
-	if err := Run(opts); err != nil {
+	if err := client.Run(opts); err != nil {
 		fmt.Fprintf(c.ErrStream, "Error! %v\n", err)
 		return exitNG
 	}
