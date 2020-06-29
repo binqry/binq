@@ -19,7 +19,17 @@ import (
 	"github.com/progrhyme/binq/schema"
 )
 
+type Mode int
+
+const (
+	ModeDLOnly Mode = 1 << iota
+	ModeExtract
+	ModeExecutable
+	ModeDefault = ModeExtract | ModeExecutable
+)
+
 type Runner struct {
+	Mode       Mode
 	Source     string
 	DestDir    string
 	DestFile   string
@@ -34,6 +44,7 @@ type Runner struct {
 }
 
 type runOpts struct {
+	mode     Mode
 	source   string
 	destDir  string
 	destFile string
@@ -50,6 +61,11 @@ func Run(opt runOpts) (err error) {
 	defaultRunner.DestFile = opt.destFile
 	defaultRunner.Logger = logs.New(opt.outs, opt.level, 0)
 	defaultRunner.httpClient = newHttpClient(DefaultHTTPTimeout)
+	if opt.mode == 0 {
+		defaultRunner.Mode = ModeDefault
+	} else {
+		defaultRunner.Mode = opt.mode
+	}
 
 	var urlStr string
 	if opt.server != "" {
@@ -76,8 +92,10 @@ func (r *Runner) Run() (err error) {
 		return err
 	}
 	defer os.RemoveAll(r.tmpdir)
-	if err = r.extract(); err != nil {
-		return err
+	if r.Mode&ModeExtract != 0 {
+		if err = r.extract(); err != nil {
+			return err
+		}
 	}
 	if err = r.locate(); err != nil {
 		return err
@@ -173,7 +191,12 @@ func (r *Runner) fetch() (err error) {
 		}
 	}()
 
-	base := path.Base(r.sourceURL)
+	url, _err := url.Parse(r.sourceURL)
+	if _err != nil {
+		// Unexpected case
+		return erron.Errorwf(_err, "Failed to parse source URL: %v", r.sourceURL)
+	}
+	base := path.Base(url.Path)
 	r.download = filepath.Join(r.tmpdir, base)
 	dl, _err := os.Create(r.download)
 	if _err != nil {
@@ -205,9 +228,10 @@ func (r *Runner) extract() (err error) {
 		return err
 	}
 
-	r.extractDir = filepath.Join(r.tmpdir, "ext")
+	base := strings.TrimSuffix(filepath.Base(r.download), filepath.Ext(r.download))
+	r.extractDir = filepath.Join(r.tmpdir, base)
 	os.Mkdir(r.extractDir, 0755)
-	r.Logger.Infof("Extracts archive %s", r.download)
+	r.Logger.Printf("Extracts archive %s", r.download)
 	if _err = unarchiver.Unarchive(r.download, r.extractDir); _err != nil {
 		return erron.Errorwf(_err, "Failed to unarchive: %s", r.download)
 	}
@@ -217,6 +241,7 @@ func (r *Runner) extract() (err error) {
 }
 
 func (r *Runner) locate() (err error) {
+	// !ModeExtract OR Unextractable file
 	if !r.extracted {
 		var dest string
 		if r.DestFile == "" {
@@ -231,14 +256,31 @@ func (r *Runner) locate() (err error) {
 		if _err != nil {
 			return erron.Errorwf(_err, "Failed to get file info: %s", dest)
 		}
-		// Assume downloaded binary is executable
-		if _err = os.Chmod(dest, fi.Mode()|0111); _err != nil {
-			return erron.Errorwf(_err, "Failed to change file mode: %s", dest)
+		if r.Mode&ModeExecutable != 0 {
+			// Assume downloaded binary is executable
+			if _err = os.Chmod(dest, fi.Mode()|0111); _err != nil {
+				return erron.Errorwf(_err, "Failed to change file mode: %s", dest)
+			}
 		}
 		r.Logger.Printf("Installed %s", dest)
 		return nil
 	}
 
+	// ModeExtract AND Succeed to Extract
+	// Codes below satisfy these conditions
+
+	// ModeExtract AND !ModeExecutable
+	// Just locate to destination directory
+	if r.Mode&ModeExecutable == 0 {
+		dest := filepath.Join(r.DestDir, filepath.Base(r.extractDir))
+		if _err := os.Rename(r.extractDir, dest); _err != nil {
+			return erron.Errorwf(_err, "Failed to locate content: %s", dest)
+		}
+		r.Logger.Printf("Installed %s", dest)
+		return nil
+	}
+
+	// ModeExtract AND ModeExecutable
 	// Walk through the extracted directory to find and locate executable files
 	installed := []string{}
 	err = filepath.Walk(r.extractDir, func(path string, info os.FileInfo, problem error) error {
@@ -256,6 +298,7 @@ func (r *Runner) locate() (err error) {
 		}
 		return nil
 	})
+
 	switch len(installed) {
 	case 0:
 		r.Logger.Warnf("Archive has no executables. None is installed")

@@ -29,6 +29,8 @@ func (c *CLI) Run(args []string) (exit int) {
 	flags.SetOutput(c.ErrStream)
 	help := flags.BoolP("help", "h", false, "show help")
 	version := flags.BoolP("version", "V", false, "show version")
+	noExtract := flags.BoolP("no-extract", "z", false, "don't extract archive")
+	noExec := flags.BoolP("no-exec", "X", false, "don't care for executable files")
 	verbose := flags.BoolP("verbose", "v", false, "verbose output")
 	debug := flags.Bool("debug", false, "show debug messages")
 	directory := flags.StringP("directory", "d", "", "output directory")
@@ -54,7 +56,16 @@ func (c *CLI) Run(args []string) (exit int) {
 		return exitNG
 	}
 
+	mode := ModeDefault
+	if *noExtract {
+		mode = mode ^ ModeExtract
+	}
+	if *noExec {
+		mode = mode ^ ModeExecutable
+	}
+
 	source := flags.Arg(0)
+
 	logLevel := logs.Notice
 	if *debug {
 		logLevel = logs.Debug
@@ -62,6 +73,7 @@ func (c *CLI) Run(args []string) (exit int) {
 		logLevel = logs.Info
 	}
 	opts := runOpts{
+		mode:     mode,
 		source:   source,
 		destDir:  *directory,
 		destFile: *file,
