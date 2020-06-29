@@ -43,33 +43,35 @@ type Runner struct {
 	extracted  bool
 }
 
-type runOpts struct {
-	mode     Mode
-	source   string
-	destDir  string
-	destFile string
-	outs     io.Writer
-	level    logs.Level
-	server   string
+type RunOption struct {
+	Mode      Mode
+	Source    string
+	DestDir   string
+	DestFile  string
+	Output    io.Writer
+	LogLevel  logs.Level
+	ServerURL string
 }
 
 var defaultRunner Runner
 
-func Run(opt runOpts) (err error) {
-	defaultRunner.Source = opt.source
-	defaultRunner.DestDir = opt.destDir
-	defaultRunner.DestFile = opt.destFile
-	defaultRunner.Logger = logs.New(opt.outs, opt.level, 0)
-	defaultRunner.httpClient = newHttpClient(DefaultHTTPTimeout)
-	if opt.mode == 0 {
+func Run(opt RunOption) (err error) {
+	defaultRunner = Runner{
+		Source:     opt.Source,
+		DestDir:    opt.DestDir,
+		DestFile:   opt.DestFile,
+		Logger:     logs.New(opt.Output, opt.LogLevel, 0),
+		httpClient: newHttpClient(DefaultHTTPTimeout),
+	}
+	if opt.Mode == 0 {
 		defaultRunner.Mode = ModeDefault
 	} else {
-		defaultRunner.Mode = opt.mode
+		defaultRunner.Mode = opt.Mode
 	}
 
 	var urlStr string
-	if opt.server != "" {
-		urlStr = opt.server
+	if opt.ServerURL != "" {
+		urlStr = opt.ServerURL
 	} else if server := os.Getenv(binq.EnvKeyServer); server != "" {
 		urlStr = server
 	}
