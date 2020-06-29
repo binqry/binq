@@ -28,15 +28,16 @@ func (c *CLI) Run(args []string) (exit int) {
 	prog := filepath.Base(args[0])
 	flags := pflag.NewFlagSet(prog, pflag.ContinueOnError)
 	flags.SetOutput(c.ErrStream)
-	help := flags.BoolP("help", "h", false, "show help")
-	version := flags.BoolP("version", "V", false, "show version")
-	noExtract := flags.BoolP("no-extract", "z", false, "don't extract archive")
-	noExec := flags.BoolP("no-exec", "X", false, "don't care for executable files")
-	verbose := flags.BoolP("verbose", "v", false, "verbose output")
-	debug := flags.Bool("debug", false, "show debug messages")
-	directory := flags.StringP("directory", "d", "", "output directory")
-	file := flags.StringP("file", "f", "", "output file name")
-	server := flags.StringP("server", "s", "", "index server URL")
+	help := flags.BoolP("help", "h", false, "Show help")
+	version := flags.BoolP("version", "V", false, "Show version")
+	target := flags.StringP("target", "t", "", "Target Item (Name or URL)")
+	directory := flags.StringP("directory", "d", "", "Output Directory")
+	file := flags.StringP("file", "f", "", "Output File name")
+	server := flags.StringP("server", "s", "", "Index Server URL")
+	noExtract := flags.BoolP("no-extract", "z", false, "Don't extract archive")
+	noExec := flags.BoolP("no-exec", "X", false, "Don't care for executable files")
+	verbose := flags.BoolP("verbose", "v", false, "Verbose output")
+	debug := flags.Bool("debug", false, "Show debug messages")
 	flags.Usage = func() { c.usage(flags, prog) }
 	if err := flags.Parse(args[1:]); err != nil {
 		fmt.Fprintf(c.ErrStream, "Error! Parsing arguments failed. %s\n", err)
@@ -51,7 +52,7 @@ func (c *CLI) Run(args []string) (exit int) {
 		return exitOK
 	}
 
-	if flags.NArg() == 0 {
+	if *target == "" && flags.NArg() == 0 {
 		fmt.Fprintln(c.ErrStream, "Error! Target is not specified!")
 		flags.Usage()
 		return exitNG
@@ -68,7 +69,12 @@ func (c *CLI) Run(args []string) (exit int) {
 		mode = client.ModeDLOnly
 	}
 
-	source := flags.Arg(0)
+	var source string
+	if *target != "" {
+		source = *target
+	} else {
+		source = flags.Arg(0)
+	}
 
 	logLevel := logs.Notice
 	if *debug {
