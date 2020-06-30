@@ -21,7 +21,7 @@ Typical commands to achieve this are following:
 
 ```sh
 bin=/usr/local/bin  # Change to your favorite path
-version=0.3.0       # Make sure this is the latest
+version=0.3.1       # Make sure this is the latest
 os=darwin           # or "linux" is supported
 tmpfile=$(mktemp)
 curl -Lo $tmpfile "https://github.com/progrhyme/binq/releases/download/v${version}/binq_${version}_${os}_amd64.zip"
@@ -43,7 +43,7 @@ Syntax:
 
 ```sh
 # Download & Extract
-binq SOURCE \
+binq [-t|--target] SOURCE \
   [-d|--dir OUTPUT_DIR] [-f|--file OUTFILE] \
   [-s|--server SERVER] \
   [-z|--no-extract] [-X|--no-exec] \
@@ -74,15 +74,16 @@ binq jq -d path/to/bin -f jq
 Options:
 
 ```
-      --debug              show debug messages
-  -d, --directory string   output directory
-  -f, --file string        output file name
-  -h, --help               show help
-  -X, --no-exec            don't care for executable files
-  -z, --no-extract         don't extract archive
-  -s, --server string      index server URL
-  -v, --verbose            verbose output
-  -V, --version            show version
+    --debug              show debug messages
+-d, --directory string   output directory
+-f, --file string        output file name
+-h, --help               show help
+-X, --no-exec            don't care for executable files
+-z, --no-extract         don't extract archive
+-s, --server string      index server URL
+-t, --target string      Target Item (Name or URL)
+-v, --verbose            verbose output
+-V, --version            show version
 ```
 
 # Binq Index Server
