@@ -15,10 +15,11 @@ type Item struct {
 }
 
 type ItemRevision struct {
-	Version      string
-	URLFormat    string
-	Checksums    []itemChecksums
-	Replacements map[string]string
+	Version      string            `json:"version"`
+	Checksums    []itemChecksums   `json:"checksums,omitempty"`
+	URLFormat    string            `json:"url-format,omitempty"`
+	Replacements map[string]string `json:"replacements,omitempty"`
+	Extension    map[string]string `json:"extension,omitempty"`
 }
 
 type ItemURLParam struct {
@@ -36,16 +37,12 @@ type itemProps struct {
 	Meta struct {
 		URLFormat    string            `json:"url-format,omitempty"`
 		Replacements map[string]string `json:"replacements,omitempty"`
+		Extension    map[string]string `json:"extension,omitempty"`
 	} `json:"meta,omitempty"`
 	Latest struct {
 		Version string `json:"version"`
 	} `json:"latest,omitempty"`
-	Versions []struct {
-		Version      string            `json:"version"`
-		Checksums    []itemChecksums   `json:"checksums,omitempty"`
-		URLFormat    string            `json:"url-format,omitempty"`
-		Replacements map[string]string `json:"replacements,omitempty"`
-	} `json:"versions,omitempty"`
+	Versions []ItemRevision `json:"versions,omitempty"`
 }
 
 func DecodeItemJSON(b []byte) (item *Item, err error) {
@@ -84,6 +81,7 @@ func (i *Item) GetLatest() (rev *ItemRevision) {
 		Version:      latest.Version,
 		URLFormat:    i.Meta.URLFormat,
 		Replacements: i.Meta.Replacements,
+		Extension:    i.Meta.Extension,
 	}
 }
 
@@ -92,6 +90,7 @@ func (i *Item) GetRevision(version string) (rev *ItemRevision) {
 		Version:      version,
 		URLFormat:    i.Meta.URLFormat,
 		Replacements: i.Meta.Replacements,
+		Extension:    i.Meta.Extension,
 	}
 
 	found := false
@@ -104,6 +103,9 @@ func (i *Item) GetRevision(version string) (rev *ItemRevision) {
 			}
 			if ver.Replacements != nil {
 				tmp.Replacements = ver.Replacements
+			}
+			if ver.Extension != nil {
+				tmp.Extension = ver.Extension
 			}
 			break
 		}
@@ -121,6 +123,16 @@ func (rev *ItemRevision) GetURL(param ItemURLParam) (url string, err error) {
 	hash["Version"] = rev.Version
 	hash["OS"] = param.OS
 	hash["Arch"] = param.Arch
+	if param.OS == "windows" {
+		hash["BinExt"] = ".exe"
+	}
+	if rev.Extension != nil {
+		if ext, ok := rev.Extension[param.OS]; ok {
+			hash["Ext"] = ext
+		} else {
+			hash["Ext"] = rev.Extension["default"]
+		}
+	}
 
 	replaced := make(map[string]string)
 	for key, val := range hash {
