@@ -100,7 +100,7 @@ func (r *Runner) prefetchItemByURL(hc *http.Client, urlPath string) (item *schem
 	if err != nil {
 		return item, err
 	}
-	r.Logger.Debugf("Decoded JSON: %+v", item)
+	r.Logger.Debugf("Decoded JSON: %s", item)
 
 	return item, nil
 }
@@ -181,7 +181,7 @@ func (r *Runner) prefetchIndex(hc *http.Client, url string) (index *schema.Index
 	if err != nil {
 		return index, err
 	}
-	r.Logger.Debugf("Decoded JSON: %+v", index)
+	r.Logger.Debugf("Decoded JSON: %s", index)
 
 	return index, nil
 }
