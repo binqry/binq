@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"text/template"
 
 	"github.com/progrhyme/binq"
 	"github.com/progrhyme/binq/client"
@@ -26,44 +27,95 @@ func newInstallCmd(common *commonCmd) (self *installCmd) {
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
 	self.option = &installOpts{
-		version:   fs.BoolP("version", "V", false, "Show version"),
-		target:    fs.StringP("target", "t", "", "Target Item (Name or URL)"),
-		directory: fs.StringP("directory", "d", "", "Output Directory"),
-		file:      fs.StringP("file", "f", "", "Output File name"),
-		server:    fs.StringP("server", "s", "", "Index Server URL"),
-		noExtract: fs.BoolP("no-extract", "z", false, "Don't extract archive"),
-		noExec:    fs.BoolP("no-exec", "X", false, "Don't care for executable files"),
-		commonOpts: &commonOpts{
-			help:    fs.BoolP("help", "h", false, "Show help"),
-			verbose: fs.BoolP("verbose", "v", false, "Verbose output"),
-			debug:   fs.Bool("debug", false, "Show debug messages"),
-		},
+		version:    fs.BoolP("version", "V", false, "# Show version"),
+		target:     fs.StringP("target", "t", "", "# Target Item (Name or URL)"),
+		directory:  fs.StringP("directory", "d", "", "# Output Directory"),
+		file:       fs.StringP("file", "f", "", "# Output File name"),
+		server:     fs.StringP("server", "s", "", "# Index Server URL"),
+		noExtract:  fs.BoolP("no-extract", "z", false, "# Don't extract archive"),
+		noExec:     fs.BoolP("no-exec", "X", false, "# Don't care for executable files"),
+		commonOpts: newCommonOpts(fs),
 	}
-	fs.Usage = self.usage
+	fs.Usage = func() { self.usage(true) }
 	self.flags = fs
 
 	return self
 }
 
-func (cmd *installCmd) usage() {
-	fmt.Fprintf(cmd.errs, `Summary:
+func (cmd *installCmd) usage(subcommand bool) {
+	if subcommand {
+		const help = `Summary:
+  Download & extract binary or archive via HTTP; then locate executable files into target directory.
+
+Syntax:
+  {{.prog}} [{{.name}}] [-t|--target] SOURCE
+    [-d|--dir OUTPUT_DIR] [-f|--file OUTFILE] \
+    [-s|--server SERVER] \
+    [-z|--no-extract] [-X|--no-exec] \
+    [-v|--verbose] [--debug]
+
+Examples:
+  # With full URL
+  {{.prog}} https://github.com/peco/peco/releases/download/v0.5.7/peco_darwin_amd64.zip \
+    -d path/to/bin
+  {{.prog}} {{.name}} -t https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 \
+    -d path/to/bin -f jq
+
+  # With index server
+  {{.prog}} {{.name}} -s https://progrhy.me/binq-index peco -d path/to/bin
+  export BINQ_SERVER=https://progrhy.me/binq-index
+  {{.prog}} jq -d path/to/bin -f jq
+
+Options:
+`
+
+		t := template.Must(template.New("usage").Parse(help))
+		t.Execute(cmd.errs, map[string]string{"prog": cmd.prog, "name": cmd.name})
+
+		cmd.flags.PrintDefaults()
+	} else {
+		// As root command
+		const help = `Summary:
   "%s" does download & extract binary or archive via HTTP; then locate executable files into target
   directory.
 
-Options:
-`, cmd.prog)
-	cmd.flags.PrintDefaults()
+Usage:
+  {{.prog}} [install] [arguments...] [options...]
+  {{.prog}} COMMAND [arguments...] [options...]
+  {{.prog}} -h|--help
+  {{.prog}} -V|--version
+
+Available Commands:
+  install (Default)  # Install binary or archive item
+  new                # Create item JSON for Index Server
+
+Run "{{.prog}} COMMAND -h|--help" to see usage of each command.
+
+General Options:
+  -h|--help     # Show help
+  -v|--verbose  # Show verbose messages
+  -d|--debug    # Show debug messages
+`
+		t := template.Must(template.New("usage").Parse(help))
+		t.Execute(cmd.errs, map[string]string{"prog": cmd.prog, "name": cmd.name})
+	}
 }
 
 func (cmd *installCmd) run(args []string) (exit int) {
+	var subcommand bool
+	if args[0] == "install" {
+		subcommand = true
+		args = args[1:]
+	}
 	if err := cmd.flags.Parse(args); err != nil {
 		fmt.Fprintf(cmd.errs, "Error! Parsing arguments failed. %s\n", err)
+		cmd.usage(subcommand)
 		return exitNG
 	}
 
 	opt := cmd.option
 	if *opt.help {
-		cmd.usage()
+		cmd.usage(subcommand)
 		return exitOK
 	} else if *opt.version {
 		fmt.Fprintf(cmd.outs, "Version: %s\n", binq.Version)
@@ -72,7 +124,7 @@ func (cmd *installCmd) run(args []string) (exit int) {
 
 	if *opt.target == "" && cmd.flags.NArg() == 0 {
 		fmt.Fprintln(cmd.errs, "Error! Target is not specified!")
-		cmd.usage()
+		cmd.usage(subcommand)
 		return exitNG
 	}
 

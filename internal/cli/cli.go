@@ -42,9 +42,26 @@ func (c *CLI) Run(args []string) (exit int) {
 	installer := newInstallCmd(common)
 
 	if len(args) == 1 {
-		installer.usage()
+		installer.usage(false)
 		return exitNG
 	}
 
+	switch args[1] {
+	case "install":
+		return installer.run(args[1:])
+	case "new":
+		creator := newCreateCmd(common)
+		creator.name = "new"
+		return creator.run(args[2:])
+	}
+
 	return installer.run(args[1:])
+}
+
+func newCommonOpts(fs *pflag.FlagSet) *commonOpts {
+	return &commonOpts{
+		help:    fs.BoolP("help", "h", false, "# Show help"),
+		verbose: fs.BoolP("verbose", "v", false, "# Show verbose messages"),
+		debug:   fs.Bool("debug", false, "# Show debug messages"),
+	}
 }
