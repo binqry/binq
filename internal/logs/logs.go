@@ -19,11 +19,11 @@ type Logging interface {
 
 type Logger struct {
 	log   *log.Logger
-	level Level
+	Level Level
 }
 
 func New(out io.Writer, lv Level, prop int) *Logger {
-	return &Logger{log: log.New(out, "", prop), level: lv}
+	return &Logger{log: log.New(out, "", prop), Level: lv}
 }
 
 func (self *Logger) Printf(fmt string, v ...interface{}) {
@@ -31,7 +31,7 @@ func (self *Logger) Printf(fmt string, v ...interface{}) {
 }
 
 func (self *Logger) writef(lv Level, fmt string, v ...interface{}) {
-	if lv >= self.level {
+	if lv >= self.Level {
 		self.log.Printf(fmt, v...)
 	}
 }
