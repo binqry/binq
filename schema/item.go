@@ -34,15 +34,19 @@ type itemChecksums struct {
 }
 
 type itemProps struct {
-	Meta struct {
-		URLFormat    string            `json:"url-format,omitempty"`
-		Replacements map[string]string `json:"replacements,omitempty"`
-		Extension    map[string]string `json:"extension,omitempty"`
-	} `json:"meta,omitempty"`
-	Latest struct {
-		Version string `json:"version"`
-	} `json:"latest,omitempty"`
-	Versions []ItemRevision `json:"versions,omitempty"`
+	Meta     itemMeta           `json:"meta,omitempty"`
+	Latest   itemLatestRevision `json:"latest,omitempty"`
+	Versions []ItemRevision     `json:"versions,omitempty"`
+}
+
+type itemMeta struct {
+	URLFormat    string            `json:"url-format,omitempty"`
+	Replacements map[string]string `json:"replacements,omitempty"`
+	Extension    map[string]string `json:"extension,omitempty"`
+}
+
+type itemLatestRevision struct {
+	Version string `json:"version"`
 }
 
 func DecodeItemJSON(b []byte) (item *Item, err error) {
@@ -52,6 +56,27 @@ func DecodeItemJSON(b []byte) (item *Item, err error) {
 	}
 	item = &Item{itemProps: &i}
 	return item, err
+}
+
+func GenerateItemJSON(rev *ItemRevision, pretty bool) (b []byte, err error) {
+	var _err error
+	prop := itemProps{
+		Meta: itemMeta{
+			URLFormat:    rev.URLFormat,
+			Replacements: rev.Replacements,
+			Extension:    rev.Extension,
+		},
+		Latest: itemLatestRevision{Version: rev.Version},
+	}
+	if pretty {
+		b, _err = json.MarshalIndent(prop, "", "  ")
+	} else {
+		b, _err = json.Marshal(prop)
+	}
+	if _err != nil {
+		return b, erron.Errorwf(_err, "Failed to marshal JSON: %+v", rev)
+	}
+	return b, nil
 }
 
 func (i *Item) String() string {
