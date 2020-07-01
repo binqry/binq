@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"text/template"
 
-	"github.com/progrhyme/binq"
 	"github.com/progrhyme/binq/client"
 	"github.com/progrhyme/binq/internal/logs"
 	"github.com/spf13/pflag"
@@ -17,7 +16,7 @@ type installCmd struct {
 
 type installOpts struct {
 	target, directory, file, server *string
-	version, noExtract, noExec      *bool
+	noExtract, noExec               *bool
 	*commonOpts
 }
 
@@ -27,7 +26,6 @@ func newInstallCmd(common *commonCmd) (self *installCmd) {
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
 	self.option = &installOpts{
-		version:    fs.BoolP("version", "V", false, "# Show version"),
 		target:     fs.StringP("target", "t", "", "# Target Item (Name or URL)"),
 		directory:  fs.StringP("directory", "d", "", "# Output Directory"),
 		file:       fs.StringP("file", "f", "", "# Output File name"),
@@ -83,11 +81,11 @@ Usage:
   {{.prog}} [install] [arguments...] [options...]
   {{.prog}} COMMAND [arguments...] [options...]
   {{.prog}} -h|--help
-  {{.prog}} -V|--version
 
 Available Commands:
   install (Default)  # Install binary or archive item
   new                # Create item JSON for Index Server
+  version            # Show {{.prog}} version
 
 Run "{{.prog}} COMMAND -h|--help" to see usage of each command.
 
@@ -116,9 +114,6 @@ func (cmd *installCmd) run(args []string) (exit int) {
 	opt := cmd.option
 	if *opt.help {
 		cmd.usage(subcommand)
-		return exitOK
-	} else if *opt.version {
-		fmt.Fprintf(cmd.outs, "Version: %s\n", binq.Version)
 		return exitOK
 	}
 
