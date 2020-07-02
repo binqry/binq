@@ -85,6 +85,7 @@ Usage:
 Available Commands:
   install (Default)  # Install binary or archive item
   new                # Create item JSON for Index Server
+  revise             # Add/Edit/Delete a version in item JSON
   version            # Show {{.prog}} version
 
 Run "{{.prog}} COMMAND -h|--help" to see usage of each command.

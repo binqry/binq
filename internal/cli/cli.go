@@ -52,6 +52,10 @@ func (c *CLI) Run(args []string) (exit int) {
 		creator := newCreateCmd(common)
 		creator.name = "new"
 		return creator.run(args[2:])
+	case "revise":
+		revisor := newReviseCmd(common)
+		revisor.name = "revise"
+		return revisor.run(args[2:])
 	case "version":
 		fmt.Fprintf(c.OutStream, "Version: %s\n", binq.Version)
 		return exitOK

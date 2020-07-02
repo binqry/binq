@@ -1,0 +1,159 @@
+package cli
+
+import (
+	"fmt"
+	"io/ioutil"
+	"text/template"
+
+	"github.com/progrhyme/binq/internal/logs"
+	"github.com/progrhyme/binq/schema/item"
+	"github.com/spf13/pflag"
+)
+
+type reviseCmd struct {
+	*commonCmd
+	option *reviseOpts
+}
+
+type reviseOpts struct {
+	urlFormat, replacements, extensions, checksums *string
+	delete, latest, noLatest                       *bool
+	*commonOpts
+}
+
+func newReviseCmd(common *commonCmd) (self *reviseCmd) {
+	self = &reviseCmd{commonCmd: common}
+
+	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
+	fs.SetOutput(self.errs)
+	self.option = &reviseOpts{
+		urlFormat:    fs.StringP("url", "u", "", "# JSON parameter for \"url-format\""),
+		replacements: fs.StringP("replace", "r", "", "# JSON parameter for \"replacements\""),
+		extensions:   fs.StringP("ext", "e", "", "# JSON parameter for \"extensions\""),
+		checksums:    fs.StringP("sum", "s", "", "# JSON parameter for \"checksums\""),
+		delete:       fs.Bool("delete", false, "# Delete version"),
+		latest:       fs.Bool("latest", false, "# Add or Update as Latest Version"),
+		noLatest:     fs.Bool("no-latest", false, "# Add or Update as Not Latest Version"),
+		commonOpts:   newCommonOpts(fs),
+	}
+	fs.Usage = self.usage
+	self.flags = fs
+
+	return self
+}
+
+func (cmd *reviseCmd) usage() {
+	const help = `Summary:
+  Revise a version in Item JSON for <<.prog>>.
+
+Usage:
+  # Add or Update Version
+  <<.prog>> <<.name>> path/to/item.json VERSION \
+    [-s|--sum CHECKSUMS] [-u|--url URL_FORMAT] [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS] \
+    [--latest] [--no-latest]
+
+  # Delete Version
+  <<.prog>> <<.name>> path/to/item.json VERSION [--delete]
+
+Examples:
+  # Add v0.1.1 if not exist
+  <<.prog>> <<.name>> foo.json 0.1.1
+  # Delete v0.1.0-dev if exists
+  <<.prog>> <<.name>> foo.json 0.1.0-dev --delete
+  # Add or Update v0.2.0 with version specific parameters
+  <<.prog>> <<.name>> foo.json 0.2.0 \
+    -s "foo-win.zip:f1d2d2f924e986ac86f,foo-mac.zip:66120903efe5b89e9" --latest
+
+Options:
+`
+
+	t := template.Must(template.New("usage").Delims("<<", ">>").Parse(help))
+	t.Execute(cmd.errs, map[string]string{"prog": cmd.prog, "name": cmd.name})
+
+	cmd.flags.PrintDefaults()
+}
+
+func (cmd *reviseCmd) run(args []string) (exit int) {
+	if err := cmd.flags.Parse(args); err != nil {
+		fmt.Fprintf(cmd.errs, "Error! Parsing arguments failed. %s\n", err)
+		return exitNG
+	}
+
+	opt := cmd.option
+	if *opt.help {
+		cmd.usage()
+		return exitOK
+	}
+	if len(args) <= 1 {
+		fmt.Fprintln(cmd.errs, "Error! Both JSON file and VERSION must be specified")
+		cmd.usage()
+		return exitNG
+	}
+
+	if *opt.debug {
+		logs.SetLevel(logs.Debug)
+	} else if *opt.verbose {
+		logs.SetLevel(logs.Info)
+	}
+
+	file, version := args[0], args[1]
+	b, err := ioutil.ReadFile(file)
+	if err != nil {
+		fmt.Fprintf(cmd.errs, "Error! Can't read file: %s. %v\n", file, err)
+		return exitNG
+	}
+
+	obj, err := item.DecodeItemJSON(b)
+	if err != nil {
+		fmt.Fprintf(cmd.errs, "Error! Failed to decode Item JSON. %v\n", err)
+		return exitNG
+	}
+	logs.Debugf("Decoded JSON: %s", obj)
+
+	if *opt.delete {
+		if deleted := obj.DeleteRevision(version); deleted == false {
+			fmt.Fprintf(cmd.errs, "Error! Version does not exist: %s\n", version)
+			return exitNG
+		}
+		logs.Debugf("Version %s deleted. After Item: %s", version, obj)
+		return cmd.writeRevisedItem(obj)
+	}
+
+	var replacements, extensions map[string]string
+	if *opt.replacements != "" {
+		replacements = parseArgToStrMap(*opt.replacements)
+	}
+	if *opt.extensions != "" {
+		extensions = parseArgToStrMap(*opt.extensions)
+	}
+
+	mode := item.ReviseModeNatural
+	if *opt.latest {
+		mode = item.ReviseModeLatest
+	} else if *opt.noLatest {
+		mode = item.ReviseModeOld
+	}
+
+	rev := &item.ItemRevision{
+		Version:      version,
+		Checksums:    item.NewItemChecksums(*opt.checksums),
+		URLFormat:    *opt.urlFormat,
+		Replacements: replacements,
+		Extension:    extensions,
+	}
+
+	obj.AddOrUpdateRevision(rev, mode)
+	logs.Debugf("Version %s updated. After Item: %s", version, obj)
+
+	return cmd.writeRevisedItem(obj)
+}
+
+func (cmd *reviseCmd) writeRevisedItem(obj *item.Item) (exit int) {
+	b, err := obj.Print(true)
+	if err != nil {
+		fmt.Fprintf(cmd.errs, "Error! Failed to print Item JSON. %v\n", err)
+		return exitNG
+	}
+	fmt.Fprintf(cmd.outs, "%s\n", b)
+	return exitOK
+}
