@@ -15,6 +15,9 @@ func GenerateItemJSON(rev *ItemRevision, pretty bool) (b []byte, err error) {
 			Extension:    rev.Extension,
 		},
 		Latest: itemLatestRevision{Version: rev.Version},
+		Versions: []ItemRevision{
+			{Version: rev.Version},
+		},
 	}
 	if pretty {
 		b, _err = json.MarshalIndent(prop, "", "  ")
