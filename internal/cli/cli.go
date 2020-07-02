@@ -33,13 +33,10 @@ type commonOpts struct {
 	help, verbose, debug *bool
 }
 
-// Default Logger in this package
-var logger *logs.Logger
-
 func (c *CLI) Run(args []string) (exit int) {
 	prog := filepath.Base(args[0])
 
-	logger = logs.New(c.ErrStream, logs.Notice, 0)
+	logs.Configure(c.ErrStream, logs.Notice, 0)
 	common := &commonCmd{outs: c.OutStream, errs: c.ErrStream, prog: prog, name: "install"}
 	installer := newInstallCmd(common)
 

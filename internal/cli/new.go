@@ -112,9 +112,9 @@ func (cmd *createCmd) run(args []string) (exit int) {
 	}
 
 	if *opt.debug {
-		logger.Level = logs.Debug
+		logs.SetLevel(logs.Debug)
 	} else if *opt.verbose {
-		logger.Level = logs.Info
+		logs.SetLevel(logs.Info)
 	}
 
 	rev := &schema.ItemRevision{
@@ -143,7 +143,7 @@ func parseArgToStrMap(arg string) (m map[string]string) {
 		case 2:
 			m[params[0]] = params[1]
 		default:
-			logger.Warnf("Wrong argement for replacement: %s", kv)
+			logs.Warnf("Wrong argement for replacement: %s", kv)
 		}
 	}
 	return m

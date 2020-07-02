@@ -144,10 +144,10 @@ func (cmd *installCmd) run(args []string) (exit int) {
 	logLevel := logs.Notice
 	if *opt.debug {
 		logLevel = logs.Debug
-		logger.Level = logs.Debug
+		logs.SetLevel(logs.Debug)
 	} else if *opt.verbose {
 		logLevel = logs.Info
-		logger.Level = logs.Info
+		logs.SetLevel(logs.Info)
 	}
 	opts := client.RunOption{
 		Mode:      mode,

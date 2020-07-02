@@ -65,3 +65,7 @@ func (self *Logger) Errorf(fmt string, v ...interface{}) {
 	fmt = strings.Join([]string{"[ERROR]", fmt}, " ")
 	self.writef(Error, fmt, v...)
 }
+
+func (self *Logger) Fatalf(fmt string, v ...interface{}) {
+	self.log.Fatalf(fmt, v...)
+}
