@@ -6,7 +6,7 @@ import (
 	"text/template"
 
 	"github.com/progrhyme/binq/internal/logs"
-	"github.com/progrhyme/binq/schema"
+	"github.com/progrhyme/binq/schema/item"
 	"github.com/spf13/pflag"
 )
 
@@ -117,14 +117,14 @@ func (cmd *createCmd) run(args []string) (exit int) {
 		logs.SetLevel(logs.Info)
 	}
 
-	rev := &schema.ItemRevision{
+	rev := &item.ItemRevision{
 		URLFormat:    urlFormat,
 		Version:      version,
 		Replacements: replacements,
 		Extension:    extensions,
 	}
 
-	b, err := schema.GenerateItemJSON(rev, true)
+	b, err := item.GenerateItemJSON(rev, true)
 	if err != nil {
 		fmt.Fprintf(cmd.errs, "Error! Failed to generate Item JSON. %v\n", err)
 		return exitNG

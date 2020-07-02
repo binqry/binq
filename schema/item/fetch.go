@@ -1,87 +1,11 @@
-package schema
+package item
 
 import (
-	"encoding/json"
-	"fmt"
 	"html/template"
 	"strings"
 
 	"github.com/progrhyme/binq/internal/erron"
 )
-
-// Item wraps itemProps which corresponds to JSON structure of item data
-type Item struct {
-	*itemProps
-}
-
-type ItemRevision struct {
-	Version      string            `json:"version"`
-	Checksums    []itemChecksums   `json:"checksums,omitempty"`
-	URLFormat    string            `json:"url-format,omitempty"`
-	Replacements map[string]string `json:"replacements,omitempty"`
-	Extension    map[string]string `json:"extension,omitempty"`
-}
-
-type ItemURLParam struct {
-	Version string
-	OS      string
-	Arch    string
-}
-
-type itemChecksums struct {
-	File   string `json:"file"`
-	Sha256 string `json:"sha256"`
-}
-
-type itemProps struct {
-	Meta     itemMeta           `json:"meta,omitempty"`
-	Latest   itemLatestRevision `json:"latest,omitempty"`
-	Versions []ItemRevision     `json:"versions,omitempty"`
-}
-
-type itemMeta struct {
-	URLFormat    string            `json:"url-format,omitempty"`
-	Replacements map[string]string `json:"replacements,omitempty"`
-	Extension    map[string]string `json:"extension,omitempty"`
-}
-
-type itemLatestRevision struct {
-	Version string `json:"version"`
-}
-
-func DecodeItemJSON(b []byte) (item *Item, err error) {
-	var i itemProps
-	if _err := json.Unmarshal(b, &i); _err != nil {
-		return item, erron.Errorwf(_err, "Failed to unmarshal JSON: %s", b)
-	}
-	item = &Item{itemProps: &i}
-	return item, err
-}
-
-func GenerateItemJSON(rev *ItemRevision, pretty bool) (b []byte, err error) {
-	var _err error
-	prop := itemProps{
-		Meta: itemMeta{
-			URLFormat:    rev.URLFormat,
-			Replacements: rev.Replacements,
-			Extension:    rev.Extension,
-		},
-		Latest: itemLatestRevision{Version: rev.Version},
-	}
-	if pretty {
-		b, _err = json.MarshalIndent(prop, "", "  ")
-	} else {
-		b, _err = json.Marshal(prop)
-	}
-	if _err != nil {
-		return b, erron.Errorwf(_err, "Failed to marshal JSON: %+v", rev)
-	}
-	return b, nil
-}
-
-func (i *Item) String() string {
-	return fmt.Sprintf("%+v", *i.itemProps)
-}
 
 func (i *Item) GetLatestURL(param ItemURLParam) (url string, err error) {
 	rev := i.GetLatest()
