@@ -65,11 +65,21 @@ Usage:
 Examples:
   # Add v0.1.1 if not exist
   <<.prog>> <<.name>> foo.json 0.1.1
+
   # Delete v0.1.0-dev if exists
   <<.prog>> <<.name>> foo.json 0.1.0-dev --delete
+
   # Add or Update v0.2.0 with version specific parameters
   <<.prog>> <<.name>> foo.json 0.2.0 \
-    -s "foo-win.zip:f1d2d2f924e986ac86f,foo-mac.zip:66120903efe5b89e9" --latest
+    -s "foo-win.zip:${sha256_win},foo-mac.zip:${sha256_mac}" --latest
+
+Parameters:
+- CHECKSUMS
+
+  Format: "<File1>:<Checksum1>[:<Algorithm1>],..."
+
+  SHA-256 is the default algorithm. To use CRC, specify like this: '-s "foo.zip:1093117945:crc"'.
+  Other algorithm is not supported for now.
 
 Options:
 `

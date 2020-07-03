@@ -8,7 +8,8 @@ import (
 
 type ItemChecksums struct {
 	File   string `json:"file"`
-	Sha256 string `json:"sha256"`
+	SHA256 string `json:"sha256,omitempty"`
+	CRC    string `json:"crc,omitempty"`
 }
 
 func NewItemChecksums(arg string) (sums []ItemChecksums) {
@@ -16,20 +17,24 @@ func NewItemChecksums(arg string) (sums []ItemChecksums) {
 		return nil
 	}
 
-	for _, kv := range strings.Split(arg, ",") {
-		var k, v string
-		for idx, s := range strings.Split(kv, ":") {
-			switch idx {
-			case 0:
-				k = s
-			case 1:
-				v = s
+	for _, entry := range strings.Split(arg, ",") {
+		params := strings.Split(entry, ":")
+		switch len(params) {
+		case 2:
+			sums = append(sums, ItemChecksums{File: params[0], SHA256: params[1]})
+		case 3:
+			switch params[2] {
+			case "sha256", "SHA256", "SHA-256":
+				sums = append(sums, ItemChecksums{File: params[0], SHA256: params[1]})
+			case "crc", "CRC":
+				sums = append(sums, ItemChecksums{File: params[0], CRC: params[1]})
 			default:
-				logs.Warnf("Wrong argement for replacement: %s", kv)
-				break
+				logs.Warnf("Unsupported algorithm: %s. Param: %s", params[2], entry)
 			}
+
+		default:
+			logs.Warnf("Wrong argement for replacement: %s", entry)
 		}
-		sums = append(sums, ItemChecksums{File: k, Sha256: v})
 	}
 	return sums
 }
