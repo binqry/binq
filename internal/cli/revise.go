@@ -57,10 +57,10 @@ Usage:
   # Add or Update Version
   <<.prog>> <<.name>> path/to/item.json VERSION \
     [-s|--sum CHECKSUMS] [-u|--url URL_FORMAT] [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS] \
-    [--latest] [--no-latest] [-y|--yes]
+    [--latest] [--no-latest] [-y|--yes] [GENERAL_OPTIONS]
 
   # Delete Version
-  <<.prog>> <<.name>> path/to/item.json VERSION --delete [-y|--yes]
+  <<.prog>> <<.name>> path/to/item.json VERSION --delete [-y|--yes] [GENERAL_OPTIONS]
 
 Examples:
   # Add v0.1.1 if not exist

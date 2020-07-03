@@ -44,7 +44,7 @@ func (cmd *createCmd) usage() {
 
 Usage:
   <<.prog>> <<.name>> URL_FORMAT [VERSION] [-f|--file OUTPUT_FILE] \
-    [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS]
+    [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS] [GENERAL_OPTIONS]
 
 Examples:
   <<.prog>> <<.name>> "https://github.com/rust-lang/mdBook/releases/download/v{{.Version}}/mdbook-v{{.Version}}-{{.Arch}}-{{.OS}}{{.Ext}}" \

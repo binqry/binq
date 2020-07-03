@@ -7,10 +7,18 @@ Mainly focuses on executable programs distributed on the internet.
 
 Choose one of below methods:
 
+- [Homebrew](https://brew.sh/) or [Linuxbrew](https://docs.brew.sh/Homebrew-on-Linux) (using Tap)
 - Download from GitHub releases
 - go get (go command is required)
 
 Description for each method follows.
+
+## Homebrew (Linuxbrew)
+
+```sh
+brew tap progrhyme/taps
+brew install binq
+```
 
 ## Download from GitHub Releases
 
@@ -47,7 +55,7 @@ binq [install] [-t|--target] SOURCE \
   [-d|--dir OUTPUT_DIR] [-f|--file OUTFILE] \
   [-s|--server SERVER] \
   [-z|--no-extract] [-X|--no-exec] \
-  [-v|--verbose] [--debug]
+  [GENERAL_OPTIONS]
 
 # Other Commands
 binq new      # Create Item JSON for Index Server
@@ -56,6 +64,14 @@ binq version  # Show binq version
 
 # Show help
 binq [COMMAND] -h|--help
+```
+
+General options for all commands:
+
+```
+-h|--help     # Show help
+-v|--verbose  # Show verbose messages
+   --debug    # Show debug messages
 ```
 
 ## binq install
@@ -78,7 +94,7 @@ binq jq -d path/to/bin -f jq
 [Index Server](#binq-index-server) serves meta data of downloadable items by `binq`.  
 See following section for more details.
 
-Command Specific Options of `binq install`:
+Command specific options for `binq install`:
 
 ```
 -d, --directory string   # Output Directory
@@ -104,15 +120,15 @@ Commands Syntax:
 ```sh
 # Generate Item JSON
 binq new URL_FORMAT [VERSION] [-f|--file OUTPUT_FILE] \
-  [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS]
+  [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS] [GENERAL_OPTIONS]
 
 # Add or Update Version in Item JSON
 binq revise ITEM_JSON_FILE VERSION \
   [-s|--sum CHECKSUMS] [-u|--url URL_FORMAT] [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS] \
-  [--latest] [--no-latest] [-y|--yes]
+  [--latest] [--no-latest] [-y|--yes] [GENERAL_OPTIONS]
 
 # Delete Version in Item JSON
-binq revise ITEM_JSON_FILE VERSION --delete [-y|--yes]
+binq revise ITEM_JSON_FILE VERSION --delete [-y|--yes] [GENERAL_OPTIONS]
 ```
 
 # Binq Index Server

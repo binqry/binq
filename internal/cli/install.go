@@ -50,7 +50,7 @@ Syntax:
     [-d|--dir OUTPUT_DIR] [-f|--file OUTFILE] \
     [-s|--server SERVER] \
     [-z|--no-extract] [-X|--no-exec] \
-    [-v|--verbose] [--debug]
+    [GENERAL_OPTIONS]
 
 Examples:
   # With full URL
@@ -93,7 +93,7 @@ Run "{{.prog}} COMMAND -h|--help" to see usage of each command.
 General Options:
   -h|--help     # Show help
   -v|--verbose  # Show verbose messages
-  -d|--debug    # Show debug messages
+     --debug    # Show debug messages
 `
 		t := template.Must(template.New("usage").Parse(help))
 		t.Execute(cmd.errs, map[string]string{"prog": cmd.prog, "name": cmd.name})
