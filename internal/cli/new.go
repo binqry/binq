@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"text/template"
 
@@ -16,7 +17,7 @@ type createCmd struct {
 }
 
 type createOpts struct {
-	replacements, extensions *string
+	replacements, extensions, file *string
 	*commonOpts
 }
 
@@ -26,6 +27,7 @@ func newCreateCmd(common *commonCmd) (self *createCmd) {
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
 	self.option = &createOpts{
+		file:         fs.StringP("file", "f", "", "# Output File name"),
 		replacements: fs.StringP("replace", "r", "", "# JSON parameter for \"replacements\""),
 		extensions:   fs.StringP("ext", "e", "", "# JSON parameter for \"extensions\""),
 		commonOpts:   newCommonOpts(fs),
@@ -41,7 +43,7 @@ func (cmd *createCmd) usage() {
   Generate a template Item JSON for <<.prog>>.
 
 Usage:
-  <<.prog>> <<.name>> URL_FORMAT [VERSION] \
+  <<.prog>> <<.name>> URL_FORMAT [VERSION] [-f|--file OUTPUT_FILE] \
     [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS]
 
 Examples:
@@ -124,13 +126,24 @@ func (cmd *createCmd) run(args []string) (exit int) {
 		Extension:    extensions,
 	}
 
-	b, err := item.GenerateItemJSON(rev, true)
+	gen, err := item.GenerateItemJSON(rev, true)
 	if err != nil {
 		fmt.Fprintf(cmd.errs, "Error! Failed to generate Item JSON. %v\n", err)
 		return exitNG
 	}
 
-	fmt.Fprintf(cmd.outs, "%s\n", b)
+	if *opt.file != "" {
+		file, err := os.OpenFile(*opt.file, os.O_WRONLY|os.O_TRUNC, 0666)
+		if err != nil {
+			fmt.Fprintf(cmd.errs, "Error! Can't open file: %s\n", *opt.file)
+			fmt.Fprintln(cmd.outs, string(gen))
+			return exitNG
+		}
+		fmt.Fprintln(file, string(gen))
+		fmt.Fprintf(cmd.errs, "Written %s\n", *opt.file)
+	} else {
+		fmt.Fprintln(cmd.outs, string(gen))
+	}
 
 	return exitOK
 }
