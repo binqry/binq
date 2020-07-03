@@ -60,7 +60,7 @@ Usage:
     [--latest] [--no-latest] [-y|--yes]
 
   # Delete Version
-  <<.prog>> <<.name>> path/to/item.json VERSION [--delete] [-y|--yes]
+  <<.prog>> <<.name>> path/to/item.json VERSION --delete [-y|--yes]
 
 Examples:
   # Add v0.1.1 if not exist

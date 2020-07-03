@@ -1,3 +1,17 @@
+## 0.4.0 (2020-07-03)
+
+Feature: ([#4](https://github.com/progrhyme/binq/pull/4))
+
+- (CLI) Add `new` subcommand to generate Item JSON
+- (CLI) Add `revise` subcommand to add/edit/delete a Version in Item JSON
+- (schema/item) Add functions to create/update/output Item data structure
+- (schema/item) Support CRC checksum
+
+Change: ([#4](https://github.com/progrhyme/binq/pull/4))
+
+- (schema) Move Item-related functionality to "schema/item" subpackage
+- (CLI) Add `version` subcommand and obsolete `-V|--version` option
+
 ## 0.3.1 (2020-07-01)
 
 Feature: ([#3](https://github.com/progrhyme/binq/pull/3))
