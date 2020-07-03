@@ -12,6 +12,7 @@ import (
 
 	"github.com/progrhyme/binq/internal/erron"
 	"github.com/progrhyme/binq/schema"
+	"github.com/progrhyme/binq/schema/item"
 )
 
 var errIndexDataNotFound = errors.New("Index Data is Not Found on given URL")
@@ -29,20 +30,20 @@ func (r *Runner) prefetch() (err error) {
 	// Use different timeout for index server
 	hc := newHttpClient(httpTimeoutToQueryIndex)
 
-	item, _err := r.prefetchItemByURL(hc, r.Source)
+	tgt, _err := r.prefetchItemByURL(hc, r.Source)
 	switch _err {
 	case nil:
 		// OK
 	case errIndexDataNotFound:
 		// Retry
-		if item, err = r.prefetchItemByIndex(hc); err != nil {
+		if tgt, err = r.prefetchItemByIndex(hc); err != nil {
 			return err
 		}
 	default:
 		return _err
 	}
 
-	srcURL, err := item.GetLatestURL(schema.ItemURLParam{OS: runtime.GOOS, Arch: runtime.GOARCH})
+	srcURL, err := tgt.GetLatestURL(item.ItemURLParam{OS: runtime.GOOS, Arch: runtime.GOARCH})
 	if err != nil {
 		return err
 	}
@@ -55,12 +56,12 @@ func (r *Runner) prefetch() (err error) {
 	return err
 }
 
-func (r *Runner) prefetchItemByURL(hc *http.Client, urlPath string) (item *schema.Item, err error) {
+func (r *Runner) prefetchItemByURL(hc *http.Client, urlPath string) (tgt *item.Item, err error) {
 	// Copy r.ServerURL
 	urlItem, _err := url.Parse(r.ServerURL.String())
 	if _err != nil {
 		// Unexpected case
-		return item, erron.Errorwf(_err, "Failed to parse server URL: %v", r.ServerURL)
+		return tgt, erron.Errorwf(_err, "Failed to parse server URL: %v", r.ServerURL)
 	}
 	urlItem.Path = path.Join(urlItem.Path, urlPath)
 
@@ -68,14 +69,14 @@ func (r *Runner) prefetchItemByURL(hc *http.Client, urlPath string) (item *schem
 	headers["Accept"] = "application/json"
 	req, err := newHttpGetRequest(urlItem.String(), headers)
 	if err != nil {
-		return item, err
+		return tgt, err
 	}
 	r.Logger.Infof("GET %s", urlItem.String())
 
 	res, _err := hc.Do(req)
 	if _err != nil {
 		err = erron.Errorwf(_err, "Failed to execute HTTP request")
-		return item, err
+		return tgt, err
 	}
 	defer res.Body.Close()
 	switch res.StatusCode {
@@ -83,29 +84,29 @@ func (r *Runner) prefetchItemByURL(hc *http.Client, urlPath string) (item *schem
 		// OK
 	case 404:
 		r.Logger.Debugf("Index Item Data is Not Found: %s", urlItem.String())
-		return item, errIndexDataNotFound
+		return tgt, errIndexDataNotFound
 	default:
 		err = fmt.Errorf("HTTP response is not OK. Code: %d, URL: %s", res.StatusCode, urlItem.String())
-		return item, err
+		return tgt, err
 	}
 
 	var b strings.Builder
 	_, _err = io.Copy(&b, res.Body)
 	if _err != nil {
 		err = erron.Errorwf(_err, "Failed to read HTTP response")
-		return item, err
+		return tgt, err
 	}
 
-	item, err = schema.DecodeItemJSON([]byte(b.String()))
+	tgt, err = item.DecodeItemJSON([]byte(b.String()))
 	if err != nil {
-		return item, err
+		return tgt, err
 	}
-	r.Logger.Debugf("Decoded JSON: %s", item)
+	r.Logger.Debugf("Decoded JSON: %s", tgt)
 
-	return item, nil
+	return tgt, nil
 }
 
-func (r *Runner) prefetchItemByIndex(hc *http.Client) (item *schema.Item, err error) {
+func (r *Runner) prefetchItemByIndex(hc *http.Client) (tgt *item.Item, err error) {
 	index, _err := r.prefetchIndex(hc, "")
 	switch _err {
 	case nil:
@@ -114,31 +115,31 @@ func (r *Runner) prefetchItemByIndex(hc *http.Client) (item *schema.Item, err er
 		if index, _err = r.prefetchIndex(hc, "index.json"); _err != nil {
 			err = erron.Errorwf(_err, "Can't get Index data from server: %s", r.ServerURL.String())
 		}
-		return item, err
+		return tgt, err
 	default:
-		return item, err
+		return tgt, err
 	}
 
 	urlPath := index.FindPath(r.Source)
 	switch urlPath {
 	case "":
 		err = fmt.Errorf("Can't find item in index. Server: %s", r.ServerURL.String())
-		return item, err
+		return tgt, err
 	case r.Source:
 		err = fmt.Errorf(
 			"Found path equals to specified Source. Won't retry. Source: %s, Server: %s",
 			r.Source, r.ServerURL.String())
-		return item, err
+		return tgt, err
 	default:
 		// OK
 	}
 
-	if item, _err = r.prefetchItemByURL(hc, urlPath); _err != nil {
+	if tgt, _err = r.prefetchItemByURL(hc, urlPath); _err != nil {
 		err = erron.Errorwf(_err, "Failed to get Item Data on path: %s", urlPath)
-		return item, err
+		return tgt, err
 	}
 
-	return item, nil
+	return tgt, nil
 }
 
 func (r *Runner) prefetchIndex(hc *http.Client, url string) (index *schema.Index, err error) {

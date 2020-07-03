@@ -1,6 +1,6 @@
 .PHONY: version
 
-VERSION := $(shell go run ./cmd/binq/*.go -V | awk '{print $$2}')
+VERSION := $(shell go run ./cmd/binq/*.go version | awk '{print $$2}')
 
 version:
 	git commit -m $(VERSION)
