@@ -8,8 +8,6 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/gookit/color"
-	"github.com/pmezard/go-difflib/difflib"
 	"github.com/progrhyme/binq/internal/logs"
 	"github.com/progrhyme/binq/schema/item"
 	"github.com/spf13/pflag"
@@ -172,72 +170,39 @@ func (cmd *reviseCmd) writeRevisedItem(obj *item.Item, src string, orig []byte) 
 		return exitNG
 	}
 
-	diff := difflib.UnifiedDiff{
-		A:        difflib.SplitLines(strings.TrimRight(string(orig), "\r\n")),
-		B:        difflib.SplitLines(string(revised)),
-		FromFile: src,
-		ToFile:   "Revised",
-		Context:  3,
-	}
-	text, err := difflib.GetUnifiedDiffString(diff)
+	diff, err := getDiff(diffArgs{
+		textA: strings.TrimRight(string(orig), "\r\n"),
+		textB: string(revised),
+		fileA: src,
+		fileB: "Revised",
+	})
 	if err != nil {
-		fmt.Fprintf(cmd.errs, "Error! Can't get diff. %v\n", err)
+		fmt.Fprintf(cmd.errs, "Error! %v\n", err)
 		return exitNG
 	}
-	if text == "" {
+	if diff == "" {
 		fmt.Fprintln(cmd.errs, "No change")
-	} else {
-		if !*cmd.option.yes {
-			if terminal.IsTerminal(1) {
-				fmt.Fprintln(cmd.outs, colorizeDiff(text))
-			} else {
-				fmt.Fprintln(cmd.outs, text)
-			}
+		return exitOK
+	}
+	if !*cmd.option.yes {
+		fprintDiff(cmd.outs, diff)
+	}
+	if terminal.IsTerminal(0) && !*cmd.option.yes {
+		fmt.Fprintf(cmd.errs, "Overwrite %s? (Y/n) ", src)
+		stdin := bufio.NewScanner(os.Stdin)
+		stdin.Scan()
+		ans := stdin.Text()
+		if strings.HasPrefix(ans, "n") || strings.HasPrefix(ans, "N") {
+			fmt.Fprintln(cmd.errs, "Canceled")
+			return exitOK
 		}
-		if terminal.IsTerminal(0) && !*cmd.option.yes {
-			fmt.Fprintf(cmd.errs, "Overwrite %s? (Y/n) ", src)
-			stdin := bufio.NewScanner(os.Stdin)
-			stdin.Scan()
-			ans := stdin.Text()
-			if strings.HasPrefix(ans, "n") || strings.HasPrefix(ans, "N") {
-				fmt.Fprintln(cmd.errs, "Canceled")
-				return exitOK
-			}
-		}
+	}
 
-		file, err := os.OpenFile(src, os.O_WRONLY|os.O_TRUNC, 0664)
-		if err != nil {
-			fmt.Fprintf(cmd.errs, "Error! Can't open file: %s\n", src)
-			return exitNG
-		}
-		defer file.Close()
-		if _, err = file.Write(revised); err != nil {
-			fmt.Fprintf(cmd.errs, "Error! Can't write file: %s\n", src)
-			return exitNG
-		}
+	if err = writeFile(src, revised, func() {
 		fmt.Fprintf(cmd.outs, "Updated %s\n", src)
+	}); err != nil {
+		return exitNG
 	}
 
 	return exitOK
-}
-
-func colorizeDiff(diff string) (colored string) {
-	lines := strings.Split(diff, "\n")
-	for i, s := range lines {
-		switch {
-		case strings.HasPrefix(s, "---"):
-			lines[i] = color.Danger.Render(s)
-		case strings.HasPrefix(s, "+++"):
-			lines[i] = color.Success.Render(s)
-		case strings.HasPrefix(s, "-"):
-			lines[i] = color.Red.Render(s)
-		case strings.HasPrefix(s, "+"):
-			lines[i] = color.Green.Render(s)
-		case strings.HasPrefix(s, "@@"):
-			lines[i] = color.Note.Render(s)
-		default:
-			// Nothing to do
-		}
-	}
-	return strings.Join(lines, "\n")
 }

@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -13,6 +14,11 @@ import (
 const (
 	exitOK = iota
 	exitNG
+)
+
+var (
+	errFileNotFound = errors.New("File not found")
+	errCanceled     = errors.New("Canceled")
 )
 
 type CLI struct {
@@ -56,6 +62,10 @@ func (c *CLI) Run(args []string) (exit int) {
 		revisor := newReviseCmd(common)
 		revisor.name = "revise"
 		return revisor.run(args[2:])
+	case "register":
+		registrar := newRegisterCmd(common)
+		registrar.name = "register"
+		return registrar.run(args[2:])
 	case "version":
 		fmt.Fprintf(c.OutStream, "Version: %s\n", binq.Version)
 		return exitOK
