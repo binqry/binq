@@ -1,18 +1,23 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"path/filepath"
 
 	"github.com/progrhyme/binq"
 	"github.com/progrhyme/binq/internal/logs"
-	"github.com/spf13/pflag"
 )
 
 const (
 	exitOK = iota
 	exitNG
+)
+
+var (
+	errFileNotFound = errors.New("File not found")
+	errCanceled     = errors.New("Canceled")
 )
 
 type CLI struct {
@@ -21,16 +26,6 @@ type CLI struct {
 
 func NewCLI(outs, errs io.Writer) *CLI {
 	return &CLI{OutStream: outs, ErrStream: errs}
-}
-
-type commonCmd struct {
-	outs, errs io.Writer
-	prog, name string
-	flags      *pflag.FlagSet
-}
-
-type commonOpts struct {
-	help, verbose, debug *bool
 }
 
 func (c *CLI) Run(args []string) (exit int) {
@@ -56,18 +51,22 @@ func (c *CLI) Run(args []string) (exit int) {
 		revisor := newReviseCmd(common)
 		revisor.name = "revise"
 		return revisor.run(args[2:])
+	case "register":
+		registrar := newRegisterCmd(common)
+		registrar.name = "register"
+		return registrar.run(args[2:])
+	case "modify":
+		modifier := newModifyCmd(common)
+		modifier.name = "modify"
+		return modifier.run(args[2:])
+	case "deregister":
+		deregistrar := newDeregisterCmd(common)
+		deregistrar.name = "deregister"
+		return deregistrar.run(args[2:])
 	case "version":
 		fmt.Fprintf(c.OutStream, "Version: %s\n", binq.Version)
 		return exitOK
 	}
 
 	return installer.run(args[1:])
-}
-
-func newCommonOpts(fs *pflag.FlagSet) *commonOpts {
-	return &commonOpts{
-		help:    fs.BoolP("help", "h", false, "# Show help"),
-		verbose: fs.BoolP("verbose", "v", false, "# Show verbose messages"),
-		debug:   fs.Bool("debug", false, "# Show debug messages"),
-	}
 }

@@ -15,7 +15,7 @@ func (i *Item) String() string {
 
 type ItemRevision struct {
 	Version      string            `json:"version"`
-	Checksums    []ItemChecksums   `json:"checksums,omitempty"`
+	Checksums    []ItemChecksum   `json:"checksums,omitempty"`
 	URLFormat    string            `json:"url-format,omitempty"`
 	Replacements map[string]string `json:"replacements,omitempty"`
 	Extension    map[string]string `json:"extension,omitempty"`

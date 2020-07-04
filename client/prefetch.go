@@ -43,7 +43,8 @@ func (r *Runner) prefetch() (err error) {
 		return _err
 	}
 
-	srcURL, err := tgt.GetLatestURL(item.ItemURLParam{OS: runtime.GOOS, Arch: runtime.GOARCH})
+	rev := tgt.GetLatest()
+	srcURL, err := rev.GetURL(item.ItemURLParam{OS: runtime.GOOS, Arch: runtime.GOARCH})
 	if err != nil {
 		return err
 	}
@@ -52,8 +53,9 @@ func (r *Runner) prefetch() (err error) {
 	}
 
 	r.sourceURL = srcURL
+	r.sourceItem = rev
 
-	return err
+	return nil
 }
 
 func (r *Runner) prefetchItemByURL(hc *http.Client, urlPath string) (tgt *item.Item, err error) {
