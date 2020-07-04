@@ -61,14 +61,24 @@ func (idx *Index) FindPath(name string) (path string) {
 	return ""
 }
 
-func (idx *Index) Add(indice *IndiceItem) {
+// Add adds indice into idx. If an IndiceItem in idx.Items has the same name to indice, it is
+// returned as conflictEntry
+func (idx *Index) Add(indice *IndiceItem) (conflictEntry *IndiceItem) {
+	j := -1
 	for i, entry := range idx.Items {
-		if entry.Name > indice.Name {
-			idx.Items = append(idx.Items[:i], append([]IndiceItem{*indice}, idx.Items[i:]...)...)
-			return
+		if entry.Name == indice.Name {
+			return &entry
+		}
+		if j == -1 && entry.Name > indice.Name {
+			j = i
 		}
 	}
-	idx.Items = append(idx.Items, *indice)
+	if j >= 0 {
+		idx.Items = append(idx.Items[:j], append([]IndiceItem{*indice}, idx.Items[j:]...)...)
+	} else {
+		idx.Items = append(idx.Items, *indice)
+	}
+	return nil
 }
 
 func (idx *Index) Swap(name string, indice *IndiceItem) (success bool) {
