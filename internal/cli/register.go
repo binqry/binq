@@ -36,12 +36,9 @@ func newRegisterCmd(common *commonCmd) (self *registerCmd) {
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
 	self.option = &registerOpts{
-		name: fs.StringP("name", "n", "", "# Identical name for Item in Index"),
-		path: fs.StringP("path", "p", "", "# Path for Item in Index"),
-		indexOpts: &indexOpts{
-			yes:        fs.BoolP("yes", "y", false, "# Update Index data without confirmation"),
-			commonOpts: newCommonOpts(fs),
-		},
+		name:      fs.StringP("name", "n", "", "# Identical name for Item in Index"),
+		path:      fs.StringP("path", "p", "", "# Path for Item in Index"),
+		indexOpts: newIndexOpts(fs),
 	}
 	fs.Usage = self.usage
 	self.flags = fs

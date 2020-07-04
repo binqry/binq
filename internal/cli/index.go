@@ -10,6 +10,7 @@ import (
 
 	"github.com/progrhyme/binq/internal/erron"
 	"github.com/progrhyme/binq/schema"
+	"github.com/spf13/pflag"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -49,6 +50,13 @@ func (cmd *indexCmd) setPrevRawIndex(b []byte) {
 
 func (opt *indexOpts) getYes() (y *bool) {
 	return opt.yes
+}
+
+func newIndexOpts(fs *pflag.FlagSet) (opt *indexOpts) {
+	return &indexOpts{
+		yes:        fs.BoolP("yes", "y", false, "# Update Index data without confirmation"),
+		commonOpts: newCommonOpts(fs),
+	}
 }
 
 func resolveIndexPathByArg(arg string) (pathIndex string, err error) {

@@ -90,3 +90,13 @@ func (idx *Index) Swap(name string, indice *IndiceItem) (success bool) {
 	}
 	return false
 }
+
+func (idx *Index) Remove(name string) (success bool) {
+	for i, entry := range idx.Items {
+		if entry.Name == name {
+			idx.Items = append(idx.Items[:i], idx.Items[i+1:]...)
+			return true
+		}
+	}
+	return false
+}

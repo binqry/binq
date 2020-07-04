@@ -59,6 +59,10 @@ func (c *CLI) Run(args []string) (exit int) {
 		modifier := newModifyCmd(common)
 		modifier.name = "modify"
 		return modifier.run(args[2:])
+	case "deregister":
+		deregistrar := newDeregisterCmd(common)
+		deregistrar.name = "deregister"
+		return deregistrar.run(args[2:])
 	case "version":
 		fmt.Fprintf(c.OutStream, "Version: %s\n", binq.Version)
 		return exitOK

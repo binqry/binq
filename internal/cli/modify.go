@@ -30,12 +30,9 @@ func newModifyCmd(common *commonCmd) (self *modifyCmd) {
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
 	self.option = &modifyOpts{
-		newName: fs.StringP("name", "n", "", "# Identical name for Item in Index"),
-		path:    fs.StringP("path", "p", "", "# Path for Item in Index"),
-		indexOpts: &indexOpts{
-			yes:        fs.BoolP("yes", "y", false, "# Update Index data without confirmation"),
-			commonOpts: newCommonOpts(fs),
-		},
+		newName:   fs.StringP("name", "n", "", "# New Name for the Item"),
+		path:      fs.StringP("path", "p", "", "# New Path for the Item"),
+		indexOpts: newIndexOpts(fs),
 	}
 	fs.Usage = self.usage
 	self.flags = fs
