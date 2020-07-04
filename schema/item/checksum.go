@@ -1,6 +1,9 @@
 package item
 
 import (
+	"crypto/sha256"
+	"hash"
+	"hash/crc32"
 	"strings"
 
 	"github.com/progrhyme/binq/internal/logs"
@@ -38,4 +41,22 @@ func NewItemChecksums(arg string) (sums []ItemChecksum) {
 		}
 	}
 	return sums
+}
+
+func (rev *ItemRevision) GetChecksum(file string) (sum *ItemChecksum) {
+	for _, cs := range rev.Checksums {
+		if cs.File == file {
+			return &cs
+		}
+	}
+	return nil
+}
+
+func (sum *ItemChecksum) GetSumAndHasher() (s string, h hash.Hash) {
+	if sum.SHA256 != "" {
+		return sum.SHA256, sha256.New()
+	} else if sum.CRC != "" {
+		return sum.CRC, crc32.NewIEEE()
+	}
+	return "", nil
 }
