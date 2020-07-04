@@ -1,3 +1,16 @@
+## 0.5.0 (2020-07-04)
+
+Feature: ([#5](https://github.com/progrhyme/binq/pull/5))
+
+- (CLI) Add `register` subcommand to add Item into Index
+- (CLI) Add `deregister` subcommand to remove Item from Index
+- (CLI) Add `modify` subcommand to edit properties of Item in Index
+- (install, client) Verify checksum of downloaded item when it is provided by Item JSON
+
+Change: ([#5](https://github.com/progrhyme/binq/pull/5))
+
+- (schema/item) Rename struct ItemChecksums -> ItemChecksum
+
 ## 0.4.0 (2020-07-03)
 
 Feature: ([#4](https://github.com/progrhyme/binq/pull/4))

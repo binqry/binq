@@ -48,7 +48,7 @@ func newRegisterCmd(common *commonCmd) (self *registerCmd) {
 
 func (cmd *registerCmd) usage() {
 	const help = `Summary:
-  Register or Update Item content on {{.prog}} Index.
+  Register or Update Item content on Local {{.prog}} Index Dataset.
 
 Usage:
   {{.prog}} {{.name}} pato/to/root[/index.json] path/to/item.json \

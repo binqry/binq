@@ -29,7 +29,7 @@ Typical commands to achieve this are following:
 
 ```sh
 bin=/usr/local/bin  # Change to your favorite path
-version=0.4.0       # Make sure this is the latest
+version=0.5.0       # Make sure this is the latest
 os=darwin           # or "linux" is supported
 tmpfile=$(mktemp)
 curl -Lo $tmpfile "https://github.com/progrhyme/binq/releases/download/v${version}/binq_${version}_${os}_amd64.zip"
@@ -58,9 +58,12 @@ binq [install] [-t|--target] SOURCE \
   [GENERAL_OPTIONS]
 
 # Other Commands
-binq new      # Create Item JSON for Index Server
-binq revise   # Add/Edit/Delete a version in Item JSON
-binq version  # Show binq version
+binq new         # Create Item JSON for Index Server
+binq revise      # Add/Edit/Delete a version in Item JSON
+binq register    # Register item JSON into Local Index Dataset
+binq modify      # Modify item properties on Local Index
+binq deregister  # Deregister item from Local Index Dataset
+binq version     # Show binq version
 
 # Show help
 binq [COMMAND] -h|--help
@@ -131,13 +134,33 @@ binq revise ITEM_JSON_FILE VERSION \
 binq revise ITEM_JSON_FILE VERSION --delete [-y|--yes] [GENERAL_OPTIONS]
 ```
 
+## Manipulate Local Index Dataset
+
+You can interact with Index Dataset using `binq`, but currently CLI only supports Local Dataset in
+filesystem.
+
+Commands Syntax:
+
+```sh
+# Register or Update Item content on Local Index Dataset
+binq register pato/to/root[/index.json] path/to/item.json \
+  [-n|--name NAME] [-p|--path PATH] [-y|--yes] [GENERAL_OPTIONS]
+
+# Modify Item properties in Local Index Dataset
+binq modify pato/to/root[/index.json] NAME \
+  [-n|--name NEW_NAME] [-p|--path PATH] [-y|--yes] [GENERAL_OPTIONS]
+
+# Deregister Item from Local Index Dataset
+binq deregister pato/to/root[/index.json] NAME [-y|--yes] [GENERAL_OPTIONS]
+```
+
 # Binq Index Server
 
 `binq` refers to an index server to fetch meta data of an item when its identifier is specified
 instead of full URL.  
 We call it **Binq Index Server**.
 
-It contains the database of downloadable items with their URLs for `binq`.  
+It contains the dataset of downloadable items with their URLs for `binq`.  
 When `binq` send a request to the server, it responds a JSON data which contains information about
 the item.
 

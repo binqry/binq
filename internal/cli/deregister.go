@@ -27,7 +27,7 @@ func newDeregisterCmd(common *commonCmd) (self *deregisterCmd) {
 
 func (cmd *deregisterCmd) usage() {
 	const help = `Summary:
-  Deregister an Item from {{.prog}} Index.
+  Deregister an Item from Local {{.prog}} Index Dataset.
 
 Usage:
   {{.prog}} {{.name}} pato/to/root[/index.json] NAME [-y|--yes] [GENERAL_OPTIONS]

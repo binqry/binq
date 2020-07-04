@@ -42,7 +42,7 @@ func newModifyCmd(common *commonCmd) (self *modifyCmd) {
 
 func (cmd *modifyCmd) usage() {
 	const help = `Summary:
-  Modify the indice properties of an Item in {{.prog}} Index.
+  Modify the indice properties of an Item in Local {{.prog}} Index Dataset.
 
 Usage:
   {{.prog}} {{.name}} pato/to/root[/index.json] NAME \
