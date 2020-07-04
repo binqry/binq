@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"bufio"
 	"fmt"
 	"io/ioutil"
 	"net/url"
@@ -11,36 +10,38 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/progrhyme/binq/internal/erron"
 	"github.com/progrhyme/binq/internal/logs"
 	"github.com/progrhyme/binq/schema"
 	"github.com/progrhyme/binq/schema/item"
 	"github.com/spf13/pflag"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 type registerCmd struct {
-	prevRawIndex []byte
-	*commonCmd
+	*indexCmd
 	option *registerOpts
 }
 
 type registerOpts struct {
 	name, path *string
-	yes        *bool
-	*commonOpts
+	*indexOpts
+}
+
+func (cmd *registerCmd) getIndexOpts() indexFlavor {
+	return cmd.option
 }
 
 func newRegisterCmd(common *commonCmd) (self *registerCmd) {
-	self = &registerCmd{commonCmd: common}
+	self = &registerCmd{indexCmd: &indexCmd{commonCmd: common}}
 
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
 	self.option = &registerOpts{
-		name:       fs.StringP("name", "n", "", "# Identical name for Item in Index"),
-		path:       fs.StringP("path", "p", "", "# Path for Item in Index"),
-		yes:        fs.BoolP("yes", "y", false, "# Update Index data without confirmation"),
-		commonOpts: newCommonOpts(fs),
+		name: fs.StringP("name", "n", "", "# Identical name for Item in Index"),
+		path: fs.StringP("path", "p", "", "# Path for Item in Index"),
+		indexOpts: &indexOpts{
+			yes:        fs.BoolP("yes", "y", false, "# Update Index data without confirmation"),
+			commonOpts: newCommonOpts(fs),
+		},
 	}
 	fs.Usage = self.usage
 	self.flags = fs
@@ -102,7 +103,7 @@ func (cmd *registerCmd) run(args []string) (exit int) {
 		logs.SetLevel(logs.Info)
 	}
 
-	fileIndex, err := parseArgIndex(args[0])
+	fileIndex, err := resolveIndexPathByArg(args[0])
 	if err != nil {
 		fmt.Fprintf(cmd.errs, "Error! %s\n", err)
 		return exitNG
@@ -153,7 +154,7 @@ func (cmd *registerCmd) run(args []string) (exit int) {
 		pathItem = indice.Path
 	}
 
-	err = cmd.writeNewIndex(idx, fileIndex)
+	err = writeNewIndex(cmd, idx, fileIndex)
 	if err != nil {
 		fmt.Fprintf(cmd.errs, "Error! %v\n", err)
 		return exitNG
@@ -183,40 +184,13 @@ func (cmd *registerCmd) run(args []string) (exit int) {
 	return exitOK
 }
 
-func parseArgIndex(arg string) (pathIndex string, err error) {
-	pathIndex = arg
-	if strings.HasSuffix(pathIndex, ".json") {
-		if filepath.Base(pathIndex) != "index.json" {
-			err = fmt.Errorf("INDEX JSON filename must be \"index.json\". Given: %s", pathIndex)
-			return pathIndex, err
-		}
-	} else {
-		pathIndex = filepath.Join(pathIndex, "index.json")
-	}
-	return pathIndex, err
-}
-
 func (cmd *registerCmd) decodeOrGenerateIndex(file string) (idx *schema.Index, err error) {
 	if _, _err := os.Stat(file); os.IsNotExist(_err) {
 		logs.Noticef("Index file doesn't exist; will be created")
 		return schema.NewIndex(), nil
 	}
 
-	// Decode Index JSON
-	raw, _err := ioutil.ReadFile(file)
-	if _err != nil {
-		err = erron.Errorwf(_err, "Error! Can't read item file: %s", file)
-		return idx, err
-	}
-
-	idx, _err = schema.DecodeIndexJSON(raw)
-	if _err != nil {
-		err = erron.Errorwf(_err, "Error! Can't decode Index JSON: %s", file)
-		return idx, err
-	}
-
-	cmd.prevRawIndex = raw
-	return idx, nil
+	return decodeIndex(cmd, file)
 }
 
 func selectPathForItem(obj *item.Item, fileItem string) (pathItem string) {
@@ -232,47 +206,4 @@ func selectPathForItem(obj *item.Item, fileItem string) (pathItem string) {
 		return path.Join(uf.Host, paths[0], paths[1], "index.json")
 	}
 	return path.Join(append(append([]string{uf.Host}, paths...), "index.json")...)
-}
-
-func (cmd *registerCmd) writeNewIndex(idx *schema.Index, fileIndex string) (err error) {
-	newRawIndex, _err := idx.Print(true)
-	if _err != nil {
-		return erron.Errorwf(_err, "Failed to encode new Index")
-	}
-
-	fromFile := "<Null>"
-	if len(cmd.prevRawIndex) > 0 {
-		fromFile = fileIndex
-	}
-
-	diff, err := getDiff(diffArgs{
-		textA: strings.TrimRight(string(cmd.prevRawIndex), "\r\n"),
-		textB: string(newRawIndex),
-		fileA: fromFile,
-		fileB: fileIndex,
-	})
-	if err != nil {
-		return err
-	}
-	if diff == "" {
-		fmt.Fprintln(cmd.errs, "Index has no change")
-		return nil
-	}
-	if !*cmd.option.yes {
-		fprintDiff(cmd.outs, diff)
-	}
-	if terminal.IsTerminal(0) && !*cmd.option.yes {
-		fmt.Fprintf(cmd.errs, "Write %s. Okay? (Y/n) ", fileIndex)
-		stdin := bufio.NewScanner(os.Stdin)
-		stdin.Scan()
-		ans := stdin.Text()
-		if strings.HasPrefix(ans, "n") || strings.HasPrefix(ans, "N") {
-			fmt.Fprintln(cmd.errs, "Canceled")
-			return errCanceled
-		}
-	}
-
-	return writeFile(fileIndex, newRawIndex, func() {
-		fmt.Fprintf(cmd.outs, "Saved %s\n", fileIndex)
-	})
 }

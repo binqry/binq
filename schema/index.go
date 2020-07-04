@@ -7,11 +7,6 @@ import (
 	"github.com/progrhyme/binq/internal/erron"
 )
 
-type IndiceItem struct {
-	Name string `json:"name"`
-	Path string `json:"path"`
-}
-
 type Index struct {
 	*indexProps
 }
