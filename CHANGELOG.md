@@ -1,3 +1,22 @@
+## 0.6.0 (2020-07-06)
+
+Feature: ([#6](https://github.com/progrhyme/binq/pull/6))
+
+- (CLI) Add `verify` subcommand to verify checksum of a Version in Item JSON
+
+Change: ([#6](https://github.com/progrhyme/binq/pull/6))
+
+- (CLI) Set logging level by `-L|--log-level LEVEL` option. Obsolete `--debug` & `-v|--verbose` options
+- (client) Export func: NewHttpClient & NewHttpGetRequest
+
+Minor Fix: ([#6](https://github.com/progrhyme/binq/pull/6))
+
+- (client) Fix potential bug: wrong condition to clear tempdir on downloading item
+
+Other: ([#6](https://github.com/progrhyme/binq/pull/6))
+
+- (testing,CI) Add some CLI tests & CI task for testing
+
 ## 0.5.0 (2020-07-04)
 
 Feature: ([#5](https://github.com/progrhyme/binq/pull/5))

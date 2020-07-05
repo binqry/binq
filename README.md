@@ -29,7 +29,7 @@ Typical commands to achieve this are following:
 
 ```sh
 bin=/usr/local/bin  # Change to your favorite path
-version=0.5.0       # Make sure this is the latest
+version=0.6.0       # Make sure this is the latest
 os=darwin           # or "linux" is supported
 tmpfile=$(mktemp)
 curl -Lo $tmpfile "https://github.com/progrhyme/binq/releases/download/v${version}/binq_${version}_${os}_amd64.zip"
@@ -60,6 +60,7 @@ binq [install] [-t|--target] SOURCE \
 # Other Commands
 binq new         # Create Item JSON for Index Server
 binq revise      # Add/Edit/Delete a version in Item JSON
+binq verify      # Verify checksum of a version in item JSON
 binq register    # Register item JSON into Local Index Dataset
 binq modify      # Modify item properties on Local Index
 binq deregister  # Deregister item from Local Index Dataset
@@ -72,9 +73,8 @@ binq [COMMAND] -h|--help
 General options for all commands:
 
 ```
--h|--help     # Show help
--v|--verbose  # Show verbose messages
-   --debug    # Show debug messages
+-h|--help               # Show help
+-L, --log-level string  # Log level (debug,info,notice,warn,error)
 ```
 
 ## binq install
@@ -122,13 +122,17 @@ Commands Syntax:
 
 ```sh
 # Generate Item JSON
-binq new URL_FORMAT [VERSION] [-f|--file OUTPUT_FILE] \
+binq new URL_FORMAT [-v|--version VERSION] [-f|--file OUTPUT_FILE] \
   [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS] [GENERAL_OPTIONS]
 
 # Add or Update Version in Item JSON
-binq revise ITEM_JSON_FILE VERSION \
+binq revise ITEM_JSON_FILE [-v|--version] VERSION \
   [-s|--sum CHECKSUMS] [-u|--url URL_FORMAT] [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS] \
   [--latest] [--no-latest] [-y|--yes] [GENERAL_OPTIONS]
+
+# Download a Version in Item JSON and Verify its checksum
+binq verify path/to/item.json [-v|--version VERSION] [-o|--os OS] [-a|--arch ARCH] \
+  [-y|--yes] [--keep] [GENERAL_OPTIONS]
 
 # Delete Version in Item JSON
 binq revise ITEM_JSON_FILE VERSION --delete [-y|--yes] [GENERAL_OPTIONS]
