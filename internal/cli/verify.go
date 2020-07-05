@@ -42,7 +42,7 @@ func newVerifyCmd(common *commonCmd) (self *verifyCmd) {
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
 	self.option = &verifyOpts{
-		version: fs.StringP("version", "V", "", "# JSON parameter for \"version\""),
+		version: fs.StringP("version", "v", "", "# JSON parameter for \"version\""),
 		os:      fs.StringP("os", "o", "", "# JSON parameter for \"{{.OS}}\""),
 		arch:    fs.StringP("arch", "a", "", "# JSON parameter for \"{{.Arch}}\""),
 		keep:    fs.Bool("keep", false, "# Delete version"),
@@ -63,7 +63,7 @@ func (cmd *verifyCmd) usage() {
   And update the checksum when needed.
 
 Usage:
-  <<.prog>> <<.name>> path/to/item.json [VERSION] [-o|--os OS] [-a|--arch ARCH] \
+  <<.prog>> <<.name>> path/to/item.json [-v|--version VERSION] [-o|--os OS] [-a|--arch ARCH] \
     [-y|--yes] [--keep] [GENERAL_OPTIONS]
 
 When VERSION argument is omitted, the latest version will be verified.
@@ -251,6 +251,6 @@ func (cmd *verifyCmd) downloadAndVerify(
 		return true, nil
 	}
 
-	fmt.Fprintf(cmd.outs, "Checksum is OK")
+	fmt.Fprintf(cmd.outs, "Checksum is OK\n")
 	return false, nil
 }

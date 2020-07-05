@@ -20,12 +20,12 @@ type commonCmd struct {
 
 type flavor interface {
 	getHelp() *bool
-	getVerbose() *bool
-	getDebug() *bool
+	getLogLevel() *string
 }
 
 type commonOpts struct {
-	help, verbose, debug *bool
+	help  *bool
+	logLv *string
 }
 
 func (cmd *commonCmd) getOuts() io.Writer {
@@ -40,26 +40,32 @@ func (opt *commonOpts) getHelp() *bool {
 	return opt.help
 }
 
-func (opt *commonOpts) getVerbose() *bool {
-	return opt.verbose
-}
-
-func (opt *commonOpts) getDebug() *bool {
-	return opt.debug
+func (opt *commonOpts) getLogLevel() *string {
+	return opt.logLv
 }
 
 func newCommonOpts(fs *pflag.FlagSet) *commonOpts {
 	return &commonOpts{
-		help:    fs.BoolP("help", "h", false, "# Show help"),
-		verbose: fs.BoolP("verbose", "v", false, "# Show verbose messages"),
-		debug:   fs.Bool("debug", false, "# Show debug messages"),
+		help:  fs.BoolP("help", "h", false, "# Show help"),
+		logLv: fs.StringP("log-level", "L", "", "# Log level (debug,info,notice,warn,error)"),
 	}
 }
 
+var logNameToLevel map[string]logs.Level = map[string]logs.Level{
+	"debug":  logs.Debug,
+	"info":   logs.Info,
+	"notice": logs.Notice,
+	"warn":   logs.Warning,
+	"error":  logs.Error,
+}
+
 func setLogLevelByOption(opt flavor) {
-	if *opt.getDebug() {
-		logs.SetLevel(logs.Debug)
-	} else if *opt.getVerbose() {
-		logs.SetLevel(logs.Info)
+	if *opt.getLogLevel() != "" {
+		lv := logNameToLevel[*opt.getLogLevel()]
+		if lv == 0 {
+			logs.Warnf("Unknown log level: %s. Use default", *opt.getLogLevel())
+		} else {
+			logs.SetLevel(lv)
+		}
 	}
 }

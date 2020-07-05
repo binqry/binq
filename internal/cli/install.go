@@ -95,9 +95,8 @@ Available Commands:
 Run "{{.prog}} COMMAND -h|--help" to see usage of each command.
 
 General Options:
-  -h|--help     # Show help
-  -v|--verbose  # Show verbose messages
-     --debug    # Show debug messages
+  -h|--help                # Show help
+  -L, --log-level string   # Log level (debug,info,notice,warn,error)
 `
 		t := template.Must(template.New("usage").Parse(help))
 		t.Execute(cmd.errs, map[string]string{"prog": cmd.prog, "name": cmd.name})

@@ -15,8 +15,8 @@ type reviseCmd struct {
 }
 
 type reviseOpts struct {
-	urlFormat, replacements, extensions, checksums *string
-	delete, latest, noLatest                       *bool
+	version, urlFormat, replacements, extensions, checksums *string
+	delete, latest, noLatest                                *bool
 	*confirmOpts
 }
 
@@ -30,6 +30,7 @@ func newReviseCmd(common *commonCmd) (self *reviseCmd) {
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
 	self.option = &reviseOpts{
+		version:      fs.StringP("version", "v", "", "# JSON parameter for \"version\""),
 		urlFormat:    fs.StringP("url", "u", "", "# JSON parameter for \"url-format\""),
 		replacements: fs.StringP("replace", "r", "", "# JSON parameter for \"replacements\""),
 		extensions:   fs.StringP("ext", "e", "", "# JSON parameter for \"extensions\""),
@@ -54,7 +55,7 @@ func (cmd *reviseCmd) usage() {
 
 Usage:
   # Add or Update Version
-  <<.prog>> <<.name>> path/to/item.json VERSION \
+  <<.prog>> <<.name>> path/to/item.json [-v|--version] VERSION \
     [-s|--sum CHECKSUMS] [-u|--url URL_FORMAT] [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS] \
     [--latest] [--no-latest] [-y|--yes] [GENERAL_OPTIONS]
 
@@ -63,7 +64,7 @@ Usage:
 
 Examples:
   # Add v0.1.1 if not exist
-  <<.prog>> <<.name>> foo.json 0.1.1
+  <<.prog>> <<.name>> foo.json -v 0.1.1
 
   # Delete v0.1.0-dev if exists
   <<.prog>> <<.name>> foo.json 0.1.0-dev --delete
@@ -107,7 +108,13 @@ func (cmd *reviseCmd) run(args []string) (exit int) {
 	}
 	setLogLevelByOption(opt)
 
-	file, version := args[0], args[1]
+	file := args[0]
+	var version string
+	if *opt.version != "" {
+		version = *opt.version
+	} else {
+		version = args[1]
+	}
 	orig, obj, err := readAndDecodeItemJSONFile(file)
 	if err != nil {
 		fmt.Fprintf(cmd.errs, "Error! %v\n", err)
