@@ -1,31 +1,31 @@
 package cli
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"strings"
 	"text/template"
 
 	"github.com/progrhyme/binq/internal/logs"
 	"github.com/progrhyme/binq/schema/item"
 	"github.com/spf13/pflag"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 type reviseCmd struct {
-	*commonCmd
+	*confirmCmd
 	option *reviseOpts
 }
 
 type reviseOpts struct {
 	urlFormat, replacements, extensions, checksums *string
-	delete, latest, noLatest, yes                  *bool
-	*commonOpts
+	delete, latest, noLatest                       *bool
+	*confirmOpts
+}
+
+func (cmd *reviseCmd) getConfirmOpts() confirmFlavor {
+	return cmd.option
 }
 
 func newReviseCmd(common *commonCmd) (self *reviseCmd) {
-	self = &reviseCmd{commonCmd: common}
+	self = &reviseCmd{confirmCmd: &confirmCmd{commonCmd: common}}
 
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
@@ -34,11 +34,13 @@ func newReviseCmd(common *commonCmd) (self *reviseCmd) {
 		replacements: fs.StringP("replace", "r", "", "# JSON parameter for \"replacements\""),
 		extensions:   fs.StringP("ext", "e", "", "# JSON parameter for \"extensions\""),
 		checksums:    fs.StringP("sum", "s", "", "# JSON parameter for \"checksums\""),
-		yes:          fs.BoolP("yes", "y", false, "# Update JSON file without confirmation"),
 		delete:       fs.Bool("delete", false, "# Delete version"),
 		latest:       fs.Bool("latest", false, "# Add or Update as Latest Version"),
 		noLatest:     fs.Bool("no-latest", false, "# Add or Update as Not Latest Version"),
-		commonOpts:   newCommonOpts(fs),
+		confirmOpts: &confirmOpts{
+			yes:        fs.BoolP("yes", "y", false, "# Update JSON file without confirmation"),
+			commonOpts: newCommonOpts(fs),
+		},
 	}
 	fs.Usage = self.usage
 	self.flags = fs
@@ -119,7 +121,7 @@ func (cmd *reviseCmd) run(args []string) (exit int) {
 			return exitNG
 		}
 		logs.Debugf("Version %s deleted. After Item: %s", version, obj)
-		return cmd.writeRevisedItem(obj, file, orig)
+		return updateItemJSON(cmd, obj, file, orig)
 	}
 
 	var replacements, extensions map[string]string
@@ -148,49 +150,5 @@ func (cmd *reviseCmd) run(args []string) (exit int) {
 	obj.AddOrUpdateRevision(rev, mode)
 	logs.Debugf("Version %s updated. After Item: %s", version, obj)
 
-	return cmd.writeRevisedItem(obj, file, orig)
-}
-
-func (cmd *reviseCmd) writeRevisedItem(obj *item.Item, src string, orig []byte) (exit int) {
-	revised, err := obj.Print(true)
-	if err != nil {
-		fmt.Fprintf(cmd.errs, "Error! Failed to print Item JSON. %v\n", err)
-		return exitNG
-	}
-
-	diff, err := getDiff(diffArgs{
-		textA: strings.TrimRight(string(orig), "\r\n"),
-		textB: string(revised),
-		fileA: src,
-		fileB: "Revised",
-	})
-	if err != nil {
-		fmt.Fprintf(cmd.errs, "Error! %v\n", err)
-		return exitNG
-	}
-	if diff == "" {
-		fmt.Fprintln(cmd.errs, "No change")
-		return exitOK
-	}
-	if !*cmd.option.yes {
-		fprintDiff(cmd.outs, diff)
-	}
-	if terminal.IsTerminal(0) && !*cmd.option.yes {
-		fmt.Fprintf(cmd.errs, "Overwrite %s? (Y/n) ", src)
-		stdin := bufio.NewScanner(os.Stdin)
-		stdin.Scan()
-		ans := stdin.Text()
-		if strings.HasPrefix(ans, "n") || strings.HasPrefix(ans, "N") {
-			fmt.Fprintln(cmd.errs, "Canceled")
-			return exitOK
-		}
-	}
-
-	if err = writeFile(src, revised, func() {
-		fmt.Fprintf(cmd.outs, "Updated %s\n", src)
-	}); err != nil {
-		return exitNG
-	}
-
-	return exitOK
+	return updateItemJSON(cmd, obj, file, orig)
 }
