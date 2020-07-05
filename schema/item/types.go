@@ -1,25 +1,12 @@
 package item
 
-import (
-	"fmt"
+type ReviseMode int
+
+const (
+	ReviseModeNatural ReviseMode = iota + 1
+	ReviseModeLatest
+	ReviseModeOld
 )
-
-// Item wraps itemProps which corresponds to JSON structure of item data
-type Item struct {
-	*itemProps
-}
-
-func (i *Item) String() string {
-	return fmt.Sprintf("%+v", *i.itemProps)
-}
-
-type ItemRevision struct {
-	Version      string            `json:"version"`
-	Checksums    []ItemChecksum   `json:"checksums,omitempty"`
-	URLFormat    string            `json:"url-format,omitempty"`
-	Replacements map[string]string `json:"replacements,omitempty"`
-	Extension    map[string]string `json:"extension,omitempty"`
-}
 
 type ItemURLParam struct {
 	Version string
