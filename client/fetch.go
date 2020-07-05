@@ -36,7 +36,7 @@ func (r *Runner) fetch() (err error) {
 		return erron.Errorwf(_err, "Failed to create tempdir")
 	}
 	defer func() {
-		if _err != nil {
+		if err != nil {
 			os.RemoveAll(r.tmpdir)
 		}
 	}()
