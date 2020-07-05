@@ -74,7 +74,7 @@ Options:
 	} else {
 		// As root command
 		const help = `Summary:
-  "%s" does download & extract binary or archive via HTTP; then locate executable files into target
+  "{{.prog}}" does download & extract binary or archive via HTTP; then locate executable files into target
   directory.
 
 Usage:
@@ -86,6 +86,7 @@ Available Commands:
   install (Default)  # Install binary or archive item
   new                # Create item JSON for Index Server
   revise             # Add/Edit/Delete a version in item JSON
+  verify             # Verify checksum of a version in item JSON
   register           # Register item JSON into Local Index Dataset
   modify             # Modify item properties on Local Index
   deregister         # Deregister item from Local Index Dataset
@@ -94,9 +95,8 @@ Available Commands:
 Run "{{.prog}} COMMAND -h|--help" to see usage of each command.
 
 General Options:
-  -h|--help     # Show help
-  -v|--verbose  # Show verbose messages
-     --debug    # Show debug messages
+  -h|--help                # Show help
+  -L, --log-level string   # Log level (debug,info,notice,warn,error)
 `
 		t := template.Must(template.New("usage").Parse(help))
 		t.Execute(cmd.errs, map[string]string{"prog": cmd.prog, "name": cmd.name})
@@ -144,22 +144,15 @@ func (cmd *installCmd) run(args []string) (exit int) {
 	} else {
 		source = cmd.flags.Arg(0)
 	}
+	setLogLevelByOption(opt)
 
-	logLevel := logs.Notice
-	if *opt.debug {
-		logLevel = logs.Debug
-		logs.SetLevel(logs.Debug)
-	} else if *opt.verbose {
-		logLevel = logs.Info
-		logs.SetLevel(logs.Info)
-	}
 	opts := client.RunOption{
 		Mode:      mode,
 		Source:    source,
 		DestDir:   *opt.directory,
 		DestFile:  *opt.file,
 		Output:    cmd.errs,
-		LogLevel:  logLevel,
+		LogLevel:  logs.GetLevel(),
 		ServerURL: *opt.server,
 	}
 	if err := client.Run(opts); err != nil {

@@ -14,7 +14,11 @@ type deregisterCmd struct {
 }
 
 func newDeregisterCmd(common *commonCmd) (self *deregisterCmd) {
-	self = &deregisterCmd{indexCmd: &indexCmd{commonCmd: common}}
+	self = &deregisterCmd{indexCmd: &indexCmd{
+		confirmCmd: &confirmCmd{
+			commonCmd: common,
+		},
+	}}
 
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
@@ -57,12 +61,7 @@ func (cmd *deregisterCmd) run(args []string) (exit int) {
 		cmd.usage()
 		return exitNG
 	}
-
-	if *opt.debug {
-		logs.SetLevel(logs.Debug)
-	} else if *opt.verbose {
-		logs.SetLevel(logs.Info)
-	}
+	setLogLevelByOption(opt)
 
 	fileIndex, err := resolveIndexPathByArg(args[0])
 	if err != nil {

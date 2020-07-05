@@ -29,16 +29,3 @@ func GenerateItemJSON(rev *ItemRevision, pretty bool) (b []byte, err error) {
 	}
 	return b, nil
 }
-
-func (i *Item) Print(pretty bool) (b []byte, err error) {
-	var _err error
-	if pretty {
-		b, _err = json.MarshalIndent(i, "", "  ")
-	} else {
-		b, _err = json.Marshal(i)
-	}
-	if _err != nil {
-		return b, erron.Errorwf(_err, "Failed to marshal JSON: %s", i)
-	}
-	return b, nil
-}

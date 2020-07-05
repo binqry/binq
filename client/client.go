@@ -59,7 +59,7 @@ func Run(opt RunOption) (err error) {
 		DestDir:    opt.DestDir,
 		DestFile:   opt.DestFile,
 		Logger:     logs.New(opt.Output, opt.LogLevel, 0),
-		httpClient: newHttpClient(DefaultHTTPTimeout),
+		httpClient: NewHttpClient(DefaultHTTPTimeout),
 	}
 	if opt.Mode == 0 {
 		defaultRunner.Mode = ModeDefault

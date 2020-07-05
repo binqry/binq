@@ -17,22 +17,26 @@ type modifyCmd struct {
 
 type modifyOpts struct {
 	newName, path *string
-	*indexOpts
+	*confirmOpts
 }
 
-func (cmd *modifyCmd) getIndexOpts() indexFlavor {
+func (cmd *modifyCmd) getConfirmOpts() confirmFlavor {
 	return cmd.option
 }
 
 func newModifyCmd(common *commonCmd) (self *modifyCmd) {
-	self = &modifyCmd{indexCmd: &indexCmd{commonCmd: common}}
+	self = &modifyCmd{indexCmd: &indexCmd{
+		confirmCmd: &confirmCmd{
+			commonCmd: common,
+		},
+	}}
 
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
 	self.option = &modifyOpts{
-		newName:   fs.StringP("name", "n", "", "# New Name for the Item"),
-		path:      fs.StringP("path", "p", "", "# New Path for the Item"),
-		indexOpts: newIndexOpts(fs),
+		newName:     fs.StringP("name", "n", "", "# New Name for the Item"),
+		path:        fs.StringP("path", "p", "", "# New Path for the Item"),
+		confirmOpts: newIndexOpts(fs),
 	}
 	fs.Usage = self.usage
 	self.flags = fs
@@ -79,12 +83,7 @@ func (cmd *modifyCmd) run(args []string) (exit int) {
 		cmd.usage()
 		return exitNG
 	}
-
-	if *opt.debug {
-		logs.SetLevel(logs.Debug)
-	} else if *opt.verbose {
-		logs.SetLevel(logs.Info)
-	}
+	setLogLevelByOption(opt)
 
 	fileIndex, err := resolveIndexPathByArg(args[0])
 	if err != nil {

@@ -15,8 +15,7 @@ import (
 )
 
 type indexRunner interface {
-	runner
-	getIndexOpts() indexFlavor
+	confirmRunner
 	getPrevRawIndex() []byte
 	setPrevRawIndex([]byte)
 }
@@ -27,17 +26,7 @@ type indexFlavor interface {
 
 type indexCmd struct {
 	prevRawIndex []byte
-	*commonCmd
-	option *indexOpts
-}
-
-type indexOpts struct {
-	yes *bool
-	*commonOpts
-}
-
-func (cmd *indexCmd) getIndexOpts() indexFlavor {
-	return cmd.option
+	*confirmCmd
 }
 
 func (cmd *indexCmd) getPrevRawIndex() (b []byte) {
@@ -48,12 +37,8 @@ func (cmd *indexCmd) setPrevRawIndex(b []byte) {
 	cmd.prevRawIndex = b
 }
 
-func (opt *indexOpts) getYes() (y *bool) {
-	return opt.yes
-}
-
-func newIndexOpts(fs *pflag.FlagSet) (opt *indexOpts) {
-	return &indexOpts{
+func newIndexOpts(fs *pflag.FlagSet) (opt *confirmOpts) {
+	return &confirmOpts{
 		yes:        fs.BoolP("yes", "y", false, "# Update Index data without confirmation"),
 		commonOpts: newCommonOpts(fs),
 	}
@@ -119,7 +104,7 @@ func writeNewIndex(cmd indexRunner, idx *schema.Index, fileIndex string) (err er
 		return nil
 	}
 
-	yes := *(cmd.getIndexOpts().getYes())
+	yes := *(cmd.getConfirmOpts().getYes())
 	if !yes {
 		fprintDiff(cmd.getOuts(), diff)
 	}

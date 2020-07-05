@@ -12,6 +12,10 @@ func Configure(out io.Writer, lv Level, prop int) {
 	defaultLogger = &Logger{log: log.New(out, "", prop), Level: lv}
 }
 
+func GetLevel() Level {
+	return defaultLogger.Level
+}
+
 func SetLevel(lv Level) {
 	defaultLogger.Level = lv
 }

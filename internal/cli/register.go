@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/url"
 	"os"
 	"path"
@@ -23,22 +22,26 @@ type registerCmd struct {
 
 type registerOpts struct {
 	name, path *string
-	*indexOpts
+	*confirmOpts
 }
 
-func (cmd *registerCmd) getIndexOpts() indexFlavor {
+func (cmd *registerCmd) getConfirmOpts() confirmFlavor {
 	return cmd.option
 }
 
 func newRegisterCmd(common *commonCmd) (self *registerCmd) {
-	self = &registerCmd{indexCmd: &indexCmd{commonCmd: common}}
+	self = &registerCmd{indexCmd: &indexCmd{
+		confirmCmd: &confirmCmd{
+			commonCmd: common,
+		},
+	}}
 
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
 	self.option = &registerOpts{
-		name:      fs.StringP("name", "n", "", "# Identical name for Item in Index"),
-		path:      fs.StringP("path", "p", "", "# Path for Item in Index"),
-		indexOpts: newIndexOpts(fs),
+		name:        fs.StringP("name", "n", "", "# Identical name for Item in Index"),
+		path:        fs.StringP("path", "p", "", "# Path for Item in Index"),
+		confirmOpts: newIndexOpts(fs),
 	}
 	fs.Usage = self.usage
 	self.flags = fs
@@ -93,12 +96,7 @@ func (cmd *registerCmd) run(args []string) (exit int) {
 		cmd.usage()
 		return exitNG
 	}
-
-	if *opt.debug {
-		logs.SetLevel(logs.Debug)
-	} else if *opt.verbose {
-		logs.SetLevel(logs.Info)
-	}
+	setLogLevelByOption(opt)
 
 	fileIndex, err := resolveIndexPathByArg(args[0])
 	if err != nil {
@@ -112,15 +110,9 @@ func (cmd *registerCmd) run(args []string) (exit int) {
 	}
 
 	fileItem := args[1]
-	rawItem, err := ioutil.ReadFile(fileItem)
+	_, obj, err := readAndDecodeItemJSONFile(fileItem)
 	if err != nil {
-		fmt.Fprintf(cmd.errs, "Error! Can't read item file: %s. %v\n", fileItem, err)
-		return exitNG
-	}
-
-	obj, err := item.DecodeItemJSON(rawItem)
-	if err != nil {
-		fmt.Fprintf(cmd.errs, "Error! Failed to decode Item JSON: %s. %v\n", fileItem, err)
+		fmt.Fprintf(cmd.errs, "Error! %v\n", err)
 		return exitNG
 	}
 

@@ -17,7 +17,7 @@ type createCmd struct {
 }
 
 type createOpts struct {
-	replacements, extensions, file *string
+	version, replacements, extensions, file *string
 	*commonOpts
 }
 
@@ -27,6 +27,7 @@ func newCreateCmd(common *commonCmd) (self *createCmd) {
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
 	self.option = &createOpts{
+		version:      fs.StringP("version", "v", "", "# JSON parameter for \"version\""),
 		file:         fs.StringP("file", "f", "", "# Output File name"),
 		replacements: fs.StringP("replace", "r", "", "# JSON parameter for \"replacements\""),
 		extensions:   fs.StringP("ext", "e", "", "# JSON parameter for \"extensions\""),
@@ -43,12 +44,12 @@ func (cmd *createCmd) usage() {
   Generate a template Item JSON for <<.prog>>.
 
 Usage:
-  <<.prog>> <<.name>> URL_FORMAT [VERSION] [-f|--file OUTPUT_FILE] \
+  <<.prog>> <<.name>> URL_FORMAT [-v|--version VERSION] [-f|--file OUTPUT_FILE] \
     [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS] [GENERAL_OPTIONS]
 
 Examples:
   <<.prog>> <<.name>> "https://github.com/rust-lang/mdBook/releases/download/v{{.Version}}/mdbook-v{{.Version}}-{{.Arch}}-{{.OS}}{{.Ext}}" \
-    0.4.0 -r amd64:x86_64,darwin:apple-darwin,linux:unknown-linux-gnu,windows:pc-windows-msvc \
+    -v 0.4.0 -r amd64:x86_64,darwin:apple-darwin,linux:unknown-linux-gnu,windows:pc-windows-msvc \
     -e default:.tar.gz,windows:.zip
 
 The command above generates JSON like this:
@@ -69,7 +70,12 @@ The command above generates JSON like this:
     },
     "latest": {
       "version": "0.4.0"
-    }
+    },
+    "versions": [
+      {
+        "version": "0.4.0"
+      }
+    ]
   }
 
 This is a valid JSON with which <<.prog>> download and install the archive "mdbook".
@@ -99,13 +105,11 @@ func (cmd *createCmd) run(args []string) (exit int) {
 		cmd.usage()
 		return exitNG
 	}
+	setLogLevelByOption(opt)
 
-	var urlFormat, version string
+	var urlFormat string
 	var replacements, extensions map[string]string
 	urlFormat = args[0]
-	if len(args) >= 2 {
-		version = args[1]
-	}
 	if *opt.replacements != "" {
 		replacements = parseArgToStrMap(*opt.replacements)
 	}
@@ -113,15 +117,9 @@ func (cmd *createCmd) run(args []string) (exit int) {
 		extensions = parseArgToStrMap(*opt.extensions)
 	}
 
-	if *opt.debug {
-		logs.SetLevel(logs.Debug)
-	} else if *opt.verbose {
-		logs.SetLevel(logs.Info)
-	}
-
 	rev := &item.ItemRevision{
 		URLFormat:    urlFormat,
-		Version:      version,
+		Version:      *opt.version,
 		Replacements: replacements,
 		Extension:    extensions,
 	}
