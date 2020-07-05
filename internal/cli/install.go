@@ -144,22 +144,15 @@ func (cmd *installCmd) run(args []string) (exit int) {
 	} else {
 		source = cmd.flags.Arg(0)
 	}
+	setLogLevelByOption(opt)
 
-	logLevel := logs.Notice
-	if *opt.debug {
-		logLevel = logs.Debug
-		logs.SetLevel(logs.Debug)
-	} else if *opt.verbose {
-		logLevel = logs.Info
-		logs.SetLevel(logs.Info)
-	}
 	opts := client.RunOption{
 		Mode:      mode,
 		Source:    source,
 		DestDir:   *opt.directory,
 		DestFile:  *opt.file,
 		Output:    cmd.errs,
-		LogLevel:  logLevel,
+		LogLevel:  logs.GetLevel(),
 		ServerURL: *opt.server,
 	}
 	if err := client.Run(opts); err != nil {

@@ -99,6 +99,7 @@ func (cmd *createCmd) run(args []string) (exit int) {
 		cmd.usage()
 		return exitNG
 	}
+	setLogLevelByOption(opt)
 
 	var urlFormat, version string
 	var replacements, extensions map[string]string
@@ -111,12 +112,6 @@ func (cmd *createCmd) run(args []string) (exit int) {
 	}
 	if *opt.extensions != "" {
 		extensions = parseArgToStrMap(*opt.extensions)
-	}
-
-	if *opt.debug {
-		logs.SetLevel(logs.Debug)
-	} else if *opt.verbose {
-		logs.SetLevel(logs.Info)
 	}
 
 	rev := &item.ItemRevision{

@@ -79,12 +79,7 @@ func (cmd *modifyCmd) run(args []string) (exit int) {
 		cmd.usage()
 		return exitNG
 	}
-
-	if *opt.debug {
-		logs.SetLevel(logs.Debug)
-	} else if *opt.verbose {
-		logs.SetLevel(logs.Info)
-	}
+	setLogLevelByOption(opt)
 
 	fileIndex, err := resolveIndexPathByArg(args[0])
 	if err != nil {

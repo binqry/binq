@@ -106,7 +106,7 @@ func buildTestRunAllCases(prog string) []testRunAllTable {
 				commands["revise"].helpText}, "\n"),
 		},
 		{
-			[]string{"revise", "no-such-file.json", "0.1"}, exitNG, "", "Error! Can't read file: ",
+			[]string{"revise", "no-such-file.json", "0.1"}, exitNG, "", "Error! Can't read item file: ",
 		},
 
 		// register

@@ -3,7 +3,6 @@ package cli
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"text/template"
@@ -104,23 +103,12 @@ func (cmd *reviseCmd) run(args []string) (exit int) {
 		cmd.usage()
 		return exitNG
 	}
-
-	if *opt.debug {
-		logs.SetLevel(logs.Debug)
-	} else if *opt.verbose {
-		logs.SetLevel(logs.Info)
-	}
+	setLogLevelByOption(opt)
 
 	file, version := args[0], args[1]
-	orig, err := ioutil.ReadFile(file)
+	orig, obj, err := readAndDecodeItemJSONFile(file)
 	if err != nil {
-		fmt.Fprintf(cmd.errs, "Error! Can't read file: %s. %v\n", file, err)
-		return exitNG
-	}
-
-	obj, err := item.DecodeItemJSON(orig)
-	if err != nil {
-		fmt.Fprintf(cmd.errs, "Error! Failed to decode Item JSON. %v\n", err)
+		fmt.Fprintf(cmd.errs, "Error! %v\n", err)
 		return exitNG
 	}
 	logs.Debugf("Decoded JSON: %s", obj)

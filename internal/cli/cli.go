@@ -15,6 +15,8 @@ const (
 	exitNG
 )
 
+const defaultLogLevel logs.Level = logs.Notice
+
 var (
 	errFileNotFound = errors.New("File not found")
 	errCanceled     = errors.New("Canceled")
@@ -31,7 +33,7 @@ func NewCLI(outs, errs io.Writer) *CLI {
 func (c *CLI) Run(args []string) (exit int) {
 	prog := filepath.Base(args[0])
 
-	logs.Configure(c.ErrStream, logs.Notice, 0)
+	logs.Configure(c.ErrStream, defaultLogLevel, 0)
 	common := &commonCmd{outs: c.OutStream, errs: c.ErrStream, prog: prog, name: "install"}
 	installer := newInstallCmd(common)
 

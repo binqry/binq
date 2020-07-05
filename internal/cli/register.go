@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/url"
 	"os"
 	"path"
@@ -93,12 +92,7 @@ func (cmd *registerCmd) run(args []string) (exit int) {
 		cmd.usage()
 		return exitNG
 	}
-
-	if *opt.debug {
-		logs.SetLevel(logs.Debug)
-	} else if *opt.verbose {
-		logs.SetLevel(logs.Info)
-	}
+	setLogLevelByOption(opt)
 
 	fileIndex, err := resolveIndexPathByArg(args[0])
 	if err != nil {
@@ -112,15 +106,9 @@ func (cmd *registerCmd) run(args []string) (exit int) {
 	}
 
 	fileItem := args[1]
-	rawItem, err := ioutil.ReadFile(fileItem)
+	_, obj, err := readAndDecodeItemJSONFile(fileItem)
 	if err != nil {
-		fmt.Fprintf(cmd.errs, "Error! Can't read item file: %s. %v\n", fileItem, err)
-		return exitNG
-	}
-
-	obj, err := item.DecodeItemJSON(rawItem)
-	if err != nil {
-		fmt.Fprintf(cmd.errs, "Error! Failed to decode Item JSON: %s. %v\n", fileItem, err)
+		fmt.Fprintf(cmd.errs, "Error! %v\n", err)
 		return exitNG
 	}
 
