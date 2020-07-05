@@ -22,22 +22,26 @@ type registerCmd struct {
 
 type registerOpts struct {
 	name, path *string
-	*indexOpts
+	*confirmOpts
 }
 
-func (cmd *registerCmd) getIndexOpts() indexFlavor {
+func (cmd *registerCmd) getConfirmOpts() confirmFlavor {
 	return cmd.option
 }
 
 func newRegisterCmd(common *commonCmd) (self *registerCmd) {
-	self = &registerCmd{indexCmd: &indexCmd{commonCmd: common}}
+	self = &registerCmd{indexCmd: &indexCmd{
+		confirmCmd: &confirmCmd{
+			commonCmd: common,
+		},
+	}}
 
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
 	self.option = &registerOpts{
-		name:      fs.StringP("name", "n", "", "# Identical name for Item in Index"),
-		path:      fs.StringP("path", "p", "", "# Path for Item in Index"),
-		indexOpts: newIndexOpts(fs),
+		name:        fs.StringP("name", "n", "", "# Identical name for Item in Index"),
+		path:        fs.StringP("path", "p", "", "# Path for Item in Index"),
+		confirmOpts: newIndexOpts(fs),
 	}
 	fs.Usage = self.usage
 	self.flags = fs

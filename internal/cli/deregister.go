@@ -14,7 +14,11 @@ type deregisterCmd struct {
 }
 
 func newDeregisterCmd(common *commonCmd) (self *deregisterCmd) {
-	self = &deregisterCmd{indexCmd: &indexCmd{commonCmd: common}}
+	self = &deregisterCmd{indexCmd: &indexCmd{
+		confirmCmd: &confirmCmd{
+			commonCmd: common,
+		},
+	}}
 
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
