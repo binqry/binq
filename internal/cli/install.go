@@ -74,7 +74,7 @@ Options:
 	} else {
 		// As root command
 		const help = `Summary:
-  "%s" does download & extract binary or archive via HTTP; then locate executable files into target
+  "{{.prog}}" does download & extract binary or archive via HTTP; then locate executable files into target
   directory.
 
 Usage:
