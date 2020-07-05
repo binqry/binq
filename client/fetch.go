@@ -18,7 +18,7 @@ func (r *Runner) fetch() (err error) {
 	if r.sourceURL == "" {
 		return fmt.Errorf("Can't fetch because sourceURL is not set. Source: %s", r.Source)
 	}
-	req, err := newHttpGetRequest(r.sourceURL, map[string]string{})
+	req, err := NewHttpGetRequest(r.sourceURL, map[string]string{})
 	if err != nil {
 		return err
 	}
@@ -72,7 +72,7 @@ func (r *Runner) fetch() (err error) {
 }
 
 func (r *Runner) downloadWithChecksum(cs *item.ItemChecksum, content io.ReadCloser, destFile *os.File) (err error) {
-	sum, hasher := cs.GetSumAndHasher()
+	sum, hasher, _ := cs.GetSumAndHasher()
 	tee := io.TeeReader(content, hasher)
 	_, _err := io.Copy(destFile, tee)
 	if _err != nil {

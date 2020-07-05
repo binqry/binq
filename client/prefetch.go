@@ -28,7 +28,7 @@ func (r *Runner) prefetch() (err error) {
 	}
 
 	// Use different timeout for index server
-	hc := newHttpClient(httpTimeoutToQueryIndex)
+	hc := NewHttpClient(httpTimeoutToQueryIndex)
 
 	tgt, _err := r.prefetchItemByURL(hc, r.Source)
 	switch _err {
@@ -69,7 +69,7 @@ func (r *Runner) prefetchItemByURL(hc *http.Client, urlPath string) (tgt *item.I
 
 	headers := make(map[string]string)
 	headers["Accept"] = "application/json"
-	req, err := newHttpGetRequest(urlItem.String(), headers)
+	req, err := NewHttpGetRequest(urlItem.String(), headers)
 	if err != nil {
 		return tgt, err
 	}
@@ -150,7 +150,7 @@ func (r *Runner) prefetchIndex(hc *http.Client, url string) (index *schema.Index
 	}
 	headers := make(map[string]string)
 	headers["Accept"] = "application/json"
-	req, err := newHttpGetRequest(url, headers)
+	req, err := NewHttpGetRequest(url, headers)
 	if err != nil {
 		return index, err
 	}

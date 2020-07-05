@@ -19,7 +19,7 @@ var (
 
 const undefinedHTTPTimeout = -1
 
-func newHttpClient(timeout time.Duration) (hc *http.Client) {
+func NewHttpClient(timeout time.Duration) (hc *http.Client) {
 	if timeout == undefinedHTTPTimeout {
 		timeout = DefaultHTTPTimeout
 	}
@@ -38,7 +38,7 @@ func newHttpClient(timeout time.Duration) (hc *http.Client) {
 	return hc
 }
 
-func newHttpGetRequest(url string, headers map[string]string) (req *http.Request, err error) {
+func NewHttpGetRequest(url string, headers map[string]string) (req *http.Request, err error) {
 	req, _err := http.NewRequest(http.MethodGet, url, nil)
 	if _err != nil {
 		return req, erron.Errorwf(_err, "Failed to create HTTP request")

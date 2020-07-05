@@ -109,6 +109,19 @@ func buildTestRunAllCases(prog string) []testRunAllTable {
 			[]string{"revise", "no-such-file.json", "0.1"}, exitNG, "", "Error! Can't read item file: ",
 		},
 
+		// verify
+		{[]string{"verify", "--help"}, exitOK, "", commands["verify"].helpText},
+		{[]string{"verify", invalidFlg}, exitNG, "", flagError},
+		{
+			[]string{"verify"}, exitNG, "",
+			strings.Join([]string{
+				"Error! Target is not specified",
+				commands["verify"].helpText}, "\n"),
+		},
+		{
+			[]string{"verify", "no-such-file.json"}, exitNG, "", "Error! Can't read item file: ",
+		},
+
 		// register
 		{[]string{"register", "--help"}, exitOK, "", commands["register"].helpText},
 		{[]string{"register", invalidFlg}, exitNG, "", flagError},
@@ -191,6 +204,12 @@ Usage:`, prog)}
 
 	info["revise"] = testCommandInfo{fmt.Sprintf(`Summary:
   Revise a version in Item JSON for %s.
+
+Usage:`, prog)}
+
+	info["verify"] = testCommandInfo{fmt.Sprintf(`Summary:
+  Download a specified version in %s Item JSON and Verify its checksum.
+  And update the checksum when needed.
 
 Usage:`, prog)}
 

@@ -127,6 +127,17 @@ func (i *Item) AddOrUpdateRevision(rev *ItemRevision, mode ReviseMode) {
 	}
 }
 
+func (i *Item) UpdateRevisionChecksum(ver string, sum *ItemChecksum) (success bool) {
+	for idx, rev := range i.Versions {
+		if rev.Version == ver {
+			rev.AddOrSwapChecksum(sum)
+			i.Versions[idx] = rev
+			return true
+		}
+	}
+	return false
+}
+
 func (i *Item) addNotLatestRevision(rev *ItemRevision, mode ReviseMode) {
 	newVer, err := version.NewVersion(rev.Version)
 	if err != nil {

@@ -53,6 +53,10 @@ func (c *CLI) Run(args []string) (exit int) {
 		revisor := newReviseCmd(common)
 		revisor.name = "revise"
 		return revisor.run(args[2:])
+	case "verify":
+		verifier := newVerifyCmd(common)
+		verifier.name = "verify"
+		return verifier.run(args[2:])
 	case "register":
 		registrar := newRegisterCmd(common)
 		registrar.name = "register"

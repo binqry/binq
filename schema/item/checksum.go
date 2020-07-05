@@ -9,6 +9,14 @@ import (
 	"github.com/progrhyme/binq/internal/logs"
 )
 
+type ChecksumType int
+
+const (
+	ChecksumTypeSHA256 ChecksumType = iota + 1
+	ChecksumTypeCRC
+	ChecksumTypeUnknown ChecksumType = -1
+)
+
 type ItemChecksum struct {
 	File   string `json:"file"`
 	SHA256 string `json:"sha256,omitempty"`
@@ -43,20 +51,23 @@ func NewItemChecksums(arg string) (sums []ItemChecksum) {
 	return sums
 }
 
-func (rev *ItemRevision) GetChecksum(file string) (sum *ItemChecksum) {
-	for _, cs := range rev.Checksums {
-		if cs.File == file {
-			return &cs
-		}
+func (sum *ItemChecksum) GetSumAndHasher() (s string, h hash.Hash, t ChecksumType) {
+	if sum.SHA256 != "" {
+		return sum.SHA256, sha256.New(), ChecksumTypeSHA256
+	} else if sum.CRC != "" {
+		return sum.CRC, crc32.NewIEEE(), ChecksumTypeCRC
 	}
-	return nil
+	return "", nil, ChecksumTypeUnknown
 }
 
-func (sum *ItemChecksum) GetSumAndHasher() (s string, h hash.Hash) {
-	if sum.SHA256 != "" {
-		return sum.SHA256, sha256.New()
-	} else if sum.CRC != "" {
-		return sum.CRC, crc32.NewIEEE()
+func (sum *ItemChecksum) SetSum(val string, t ChecksumType) {
+	switch t {
+	case ChecksumTypeSHA256:
+		sum.SHA256 = val
+	case ChecksumTypeCRC:
+		sum.SHA256 = val
+	default:
+		// Unexpected
+		logs.Fatalf("Unsupported type for checksum: %d", t)
 	}
-	return "", nil
 }

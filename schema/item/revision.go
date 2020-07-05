@@ -15,6 +15,25 @@ type ItemRevision struct {
 	Extension    map[string]string `json:"extension,omitempty"`
 }
 
+func (rev *ItemRevision) GetChecksum(file string) (sum *ItemChecksum) {
+	for _, cs := range rev.Checksums {
+		if cs.File == file {
+			return &cs
+		}
+	}
+	return nil
+}
+
+func (rev *ItemRevision) AddOrSwapChecksum(sum *ItemChecksum) {
+	for i, cs := range rev.Checksums {
+		if cs.File == sum.File {
+			rev.Checksums[i] = *sum
+			return
+		}
+	}
+	rev.Checksums = append(rev.Checksums, *sum)
+}
+
 func (rev *ItemRevision) GetURL(param ItemURLParam) (url string, err error) {
 	// Convert param into map to apply replacements
 	hash := make(map[string]string)
