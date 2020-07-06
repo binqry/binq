@@ -1,3 +1,6 @@
+[![release](https://badgen.net/github/release/progrhyme/binq)](https://github.com/progrhyme/binq/releases)
+[![go-test](https://github.com/progrhyme/binq/workflows/go-test/badge.svg)](https://github.com/progrhyme/binq/actions?query=workflow%3Ago-test)
+
 # binq
 
 Download items via HTTP and extract them when compressed.  
@@ -42,7 +45,7 @@ rm $tmpfile
 Just run this:
 
 ```sh
-go get github.com/progrhyme/binq
+go get github.com/progrhyme/binq/cmd/binq
 ```
 
 # CLI Usage
@@ -51,7 +54,7 @@ Syntax:
 
 ```sh
 # Main Command. Download & Extract target binary/archive
-binq [install] [-t|--target] SOURCE \
+binq [install] [-t|--target] SOURCE[@VERSION] \
   [-d|--dir OUTPUT_DIR] [-f|--file OUTFILE] \
   [-s|--server SERVER] \
   [-z|--no-extract] [-X|--no-exec] \
@@ -91,7 +94,8 @@ binq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 \
 # With Index Server
 binq -s https://progrhy.me/binq-index peco -d path/to/bin
 export BINQ_SERVER=https://progrhy.me/binq-index
-binq jq -d path/to/bin -f jq
+export BINQ_BIN_DIR=path/to/bin
+binq jq@1.6 -f jq
 ```
 
 [Index Server](#binq-index-server) serves meta data of downloadable items by `binq`.  
