@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/progrhyme/binq/internal/logs"
+	"github.com/progrhyme/go-lv"
 	"github.com/spf13/pflag"
 )
 
@@ -102,7 +102,7 @@ func (cmd *modifyCmd) run(args []string) (exit int) {
 		fmt.Fprintf(cmd.errs, "Item not found in index. Name: %s, Index: %s\n", name, fileIndex)
 		return exitNG
 	}
-	logs.Noticef("Target indice: %s", indice)
+	lv.Noticef("Target indice: %s", indice)
 
 	newName, newPathItem := *opt.newName, *opt.path
 

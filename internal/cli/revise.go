@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"text/template"
 
-	"github.com/progrhyme/binq/internal/logs"
+	"github.com/progrhyme/go-lv"
 	"github.com/progrhyme/binq/schema/item"
 	"github.com/spf13/pflag"
 )
@@ -120,14 +120,14 @@ func (cmd *reviseCmd) run(args []string) (exit int) {
 		fmt.Fprintf(cmd.errs, "Error! %v\n", err)
 		return exitNG
 	}
-	logs.Debugf("Decoded JSON: %s", obj)
+	lv.Debugf("Decoded JSON: %s", obj)
 
 	if *opt.delete {
 		if deleted := obj.DeleteRevision(version); deleted == false {
 			fmt.Fprintf(cmd.errs, "Error! Version does not exist: %s\n", version)
 			return exitNG
 		}
-		logs.Debugf("Version %s deleted. After Item: %s", version, obj)
+		lv.Debugf("Version %s deleted. After Item: %s", version, obj)
 		return updateItemJSON(cmd, obj, file, orig)
 	}
 
@@ -155,7 +155,7 @@ func (cmd *reviseCmd) run(args []string) (exit int) {
 	}
 
 	obj.AddOrUpdateRevision(rev, mode)
-	logs.Debugf("Version %s updated. After Item: %s", version, obj)
+	lv.Debugf("Version %s updated. After Item: %s", version, obj)
 
 	return updateItemJSON(cmd, obj, file, orig)
 }

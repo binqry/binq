@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/progrhyme/binq/internal/logs"
+	"github.com/progrhyme/go-lv"
 	"github.com/spf13/pflag"
 )
 
@@ -80,7 +80,7 @@ func (cmd *deregisterCmd) run(args []string) (exit int) {
 		fmt.Fprintf(cmd.errs, "Item not found in index. Name: %s, Index: %s\n", name, fileIndex)
 		return exitNG
 	}
-	logs.Noticef("Target indice: %s", indice)
+	lv.Noticef("Target indice: %s", indice)
 
 	if !idx.Remove(name) {
 		// Unexpected
@@ -98,7 +98,7 @@ func (cmd *deregisterCmd) run(args []string) (exit int) {
 	pathItem := indice.Path
 	for _, i := range idx.Items {
 		if i.Path == pathItem {
-			logs.Noticef("Item \"%s\" still refers to \"%s\"", i.Name, i.Path)
+			lv.Noticef("Item \"%s\" still refers to \"%s\"", i.Name, i.Path)
 			exists = true
 		}
 	}
@@ -110,7 +110,7 @@ func (cmd *deregisterCmd) run(args []string) (exit int) {
 		case nil:
 			fmt.Fprintf(cmd.outs, "Deleted Item JSON: %s\n", pathItem)
 		case errFileNotFound:
-			logs.Warnf("Can't remove file: %s. Not Found", pathItem)
+			lv.Warnf("Can't remove file: %s. Not Found", pathItem)
 		default:
 			fmt.Fprintf(cmd.errs, "Error! %v\n", err)
 			return exitNG

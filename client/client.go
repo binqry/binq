@@ -12,8 +12,8 @@ import (
 	"github.com/mholt/archiver/v3"
 	"github.com/progrhyme/binq"
 	"github.com/progrhyme/binq/internal/erron"
-	"github.com/progrhyme/binq/internal/logs"
 	"github.com/progrhyme/binq/schema/item"
+	"github.com/progrhyme/go-lv"
 )
 
 type Mode int
@@ -30,7 +30,7 @@ type Runner struct {
 	Source     string
 	DestDir    string
 	DestFile   string
-	Logger     logs.Logging
+	Logger     lv.Loggable
 	ServerURL  *url.URL
 	httpClient *http.Client
 	sourceURL  string
@@ -47,7 +47,7 @@ type RunOption struct {
 	DestDir   string
 	DestFile  string
 	Output    io.Writer
-	LogLevel  logs.Level
+	LogLevel  lv.Level
 	ServerURL string
 }
 
@@ -58,7 +58,7 @@ func Run(opt RunOption) (err error) {
 		Source:     opt.Source,
 		DestDir:    opt.DestDir,
 		DestFile:   opt.DestFile,
-		Logger:     logs.New(opt.Output, opt.LogLevel, 0),
+		Logger:     lv.New(opt.Output, opt.LogLevel, 0),
 		httpClient: NewHttpClient(DefaultHTTPTimeout),
 	}
 	if opt.Mode == 0 {

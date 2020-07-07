@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/progrhyme/binq"
-	"github.com/progrhyme/binq/internal/logs"
+	"github.com/progrhyme/go-lv"
 )
 
 const (
@@ -15,7 +15,7 @@ const (
 	exitNG
 )
 
-const defaultLogLevel logs.Level = logs.Notice
+const defaultLogLevel lv.Level = lv.LNotice
 
 var (
 	errFileNotFound = errors.New("File not found")
@@ -33,7 +33,7 @@ func NewCLI(outs, errs io.Writer) *CLI {
 func (c *CLI) Run(args []string) (exit int) {
 	prog := filepath.Base(args[0])
 
-	logs.Configure(c.ErrStream, defaultLogLevel, 0)
+	lv.Configure(c.ErrStream, defaultLogLevel, 0)
 	common := &commonCmd{outs: c.OutStream, errs: c.ErrStream, prog: prog, name: "install"}
 	installer := newInstallCmd(common)
 

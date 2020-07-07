@@ -5,7 +5,7 @@ import (
 	"text/template"
 
 	"github.com/progrhyme/binq/client"
-	"github.com/progrhyme/binq/internal/logs"
+	"github.com/progrhyme/go-lv"
 	"github.com/spf13/pflag"
 )
 
@@ -152,7 +152,7 @@ func (cmd *installCmd) run(args []string) (exit int) {
 		DestDir:   *opt.directory,
 		DestFile:  *opt.file,
 		Output:    cmd.errs,
-		LogLevel:  logs.GetLevel(),
+		LogLevel:  lv.GetLevel(),
 		ServerURL: *opt.server,
 	}
 	if err := client.Run(opts); err != nil {

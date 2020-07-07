@@ -6,7 +6,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/progrhyme/binq/internal/logs"
+	"github.com/progrhyme/go-lv"
 	"github.com/progrhyme/binq/schema/item"
 	"github.com/spf13/pflag"
 )
@@ -154,7 +154,7 @@ func parseArgToStrMap(arg string) (m map[string]string) {
 		case 2:
 			m[params[0]] = params[1]
 		default:
-			logs.Warnf("Wrong argement for replacement: %s", kv)
+			lv.Warnf("Wrong argement for replacement: %s", kv)
 		}
 	}
 	return m

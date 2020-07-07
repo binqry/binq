@@ -14,7 +14,7 @@ import (
 
 	"github.com/progrhyme/binq/client"
 	"github.com/progrhyme/binq/internal/erron"
-	"github.com/progrhyme/binq/internal/logs"
+	"github.com/progrhyme/go-lv"
 	"github.com/progrhyme/binq/schema/item"
 	"github.com/spf13/pflag"
 )
@@ -107,7 +107,7 @@ func (cmd *verifyCmd) run(args []string) (exit int) {
 		fmt.Fprintf(cmd.errs, "Error! %v\n", err)
 		return exitNG
 	}
-	logs.Debugf("Decoded JSON: %s", obj)
+	lv.Debugf("Decoded JSON: %s", obj)
 
 	rev, err := getItemRevisionByOpt(obj, opt)
 	if err != nil {
@@ -174,7 +174,7 @@ func (cmd *verifyCmd) run(args []string) (exit int) {
 
 	cs := rev.GetChecksum(file)
 	if cs == nil {
-		logs.Noticef("Checksum is not provided")
+		lv.Noticef("Checksum is not provided")
 		cs = &item.ItemChecksum{
 			File:   file,
 			SHA256: initialDummyChecksum, // To be replaced on verification
@@ -189,7 +189,7 @@ func (cmd *verifyCmd) run(args []string) (exit int) {
 
 	if updated {
 		obj.UpdateRevisionChecksum(rev.Version, cs)
-		logs.Debugf("Item updated. After Item: %s", obj)
+		lv.Debugf("Item updated. After Item: %s", obj)
 		return updateItemJSON(cmd, obj, fileItem, orig)
 	}
 
@@ -239,10 +239,10 @@ func (cmd *verifyCmd) downloadAndVerify(
 	if _err != nil {
 		return different, erron.Errorwf(_err, "Failed to read HTTP response")
 	}
-	logs.Debugf("Saved file %s", destPath)
+	lv.Debugf("Saved file %s", destPath)
 
 	cksum := hex.EncodeToString(hasher.Sum(nil))
-	logs.Debugf("Sum: %s", cksum)
+	lv.Debugf("Sum: %s", cksum)
 	if sum != cksum {
 		if sum != initialDummyChecksum {
 			fmt.Fprintf(cmd.errs, "Warning! Checksum differs. Expected: %s, Got: %s\n", sum, cksum)

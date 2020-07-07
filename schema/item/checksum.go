@@ -6,7 +6,7 @@ import (
 	"hash/crc32"
 	"strings"
 
-	"github.com/progrhyme/binq/internal/logs"
+	"github.com/progrhyme/go-lv"
 )
 
 type ChecksumType int
@@ -41,11 +41,11 @@ func NewItemChecksums(arg string) (sums []ItemChecksum) {
 			case "crc", "CRC":
 				sums = append(sums, ItemChecksum{File: params[0], CRC: params[1]})
 			default:
-				logs.Warnf("Unsupported algorithm: %s. Param: %s", params[2], entry)
+				lv.Warnf("Unsupported algorithm: %s. Param: %s", params[2], entry)
 			}
 
 		default:
-			logs.Warnf("Wrong argement for replacement: %s", entry)
+			lv.Warnf("Wrong argement for replacement: %s", entry)
 		}
 	}
 	return sums
@@ -68,6 +68,6 @@ func (sum *ItemChecksum) SetSum(val string, t ChecksumType) {
 		sum.SHA256 = val
 	default:
 		// Unexpected
-		logs.Fatalf("Unsupported type for checksum: %d", t)
+		lv.Fatalf("Unsupported type for checksum: %d", t)
 	}
 }

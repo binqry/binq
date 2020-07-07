@@ -9,7 +9,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/progrhyme/binq/internal/logs"
+	"github.com/progrhyme/go-lv"
 	"github.com/progrhyme/binq/schema"
 	"github.com/progrhyme/binq/schema/item"
 	"github.com/spf13/pflag"
@@ -163,7 +163,7 @@ func (cmd *registerCmd) run(args []string) (exit int) {
 		case nil:
 			fmt.Fprintf(cmd.outs, "Deleted old Item JSON: %s\n", oldPathItem)
 		case errFileNotFound:
-			logs.Warnf("Can't remove file: %s. Not Found", oldPathItem)
+			lv.Warnf("Can't remove file: %s. Not Found", oldPathItem)
 		default:
 			fmt.Fprintf(cmd.errs, "Error! %v\n", err)
 			return exitNG
@@ -175,7 +175,7 @@ func (cmd *registerCmd) run(args []string) (exit int) {
 
 func (cmd *registerCmd) decodeOrGenerateIndex(file string) (idx *schema.Index, err error) {
 	if _, _err := os.Stat(file); os.IsNotExist(_err) {
-		logs.Noticef("Index file doesn't exist; will be created")
+		lv.Noticef("Index file doesn't exist; will be created")
 		return schema.NewIndex(), nil
 	}
 
@@ -185,7 +185,7 @@ func (cmd *registerCmd) decodeOrGenerateIndex(file string) (idx *schema.Index, e
 func selectPathForItem(obj *item.Item, fileItem string) (pathItem string) {
 	uf, err := url.Parse(obj.Meta.URLFormat)
 	if err != nil {
-		logs.Warnf("Failed to parse url-format of item: %s. %v", obj.Meta.URLFormat, err)
+		lv.Warnf("Failed to parse url-format of item: %s. %v", obj.Meta.URLFormat, err)
 		return fileItem
 	}
 

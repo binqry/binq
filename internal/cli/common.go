@@ -3,7 +3,7 @@ package cli
 import (
 	"io"
 
-	"github.com/progrhyme/binq/internal/logs"
+	"github.com/progrhyme/go-lv"
 	"github.com/spf13/pflag"
 )
 
@@ -51,21 +51,13 @@ func newCommonOpts(fs *pflag.FlagSet) *commonOpts {
 	}
 }
 
-var logNameToLevel map[string]logs.Level = map[string]logs.Level{
-	"debug":  logs.Debug,
-	"info":   logs.Info,
-	"notice": logs.Notice,
-	"warn":   logs.Warning,
-	"error":  logs.Error,
-}
-
 func setLogLevelByOption(opt flavor) {
 	if *opt.getLogLevel() != "" {
-		lv := logNameToLevel[*opt.getLogLevel()]
-		if lv == 0 {
-			logs.Warnf("Unknown log level: %s. Use default", *opt.getLogLevel())
+		level := lv.WordToLevel(*opt.getLogLevel())
+		if level == 0 {
+			lv.Warnf("Unknown log level: %s. Use default", *opt.getLogLevel())
 		} else {
-			logs.SetLevel(lv)
+			lv.SetLevel(level)
 		}
 	}
 }

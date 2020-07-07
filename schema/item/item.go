@@ -6,7 +6,7 @@ import (
 
 	"github.com/hashicorp/go-version"
 	"github.com/progrhyme/binq/internal/erron"
-	"github.com/progrhyme/binq/internal/logs"
+	"github.com/progrhyme/go-lv"
 )
 
 // Item wraps itemProps which corresponds to JSON structure of item data
@@ -123,7 +123,7 @@ func (i *Item) AddOrUpdateRevision(rev *ItemRevision, mode ReviseMode) {
 		i.addNotLatestRevision(rev, mode)
 
 	default:
-		logs.Fatalf("Fatal Error! Invalid mode: %v", mode)
+		lv.Fatalf("Fatal Error! Invalid mode: %v", mode)
 	}
 }
 
@@ -141,11 +141,11 @@ func (i *Item) UpdateRevisionChecksum(ver string, sum *ItemChecksum) (success bo
 func (i *Item) addNotLatestRevision(rev *ItemRevision, mode ReviseMode) {
 	newVer, err := version.NewVersion(rev.Version)
 	if err != nil {
-		logs.Noticef("Given version is not parsed as version")
+		lv.Noticef("Given version is not parsed as version")
 		for idx, rv := range i.Versions {
 			_, err := version.NewVersion(rv.Version)
 			if err != nil {
-				logs.Debugf("Fail to parse version: %s", rv.Version)
+				lv.Debugf("Fail to parse version: %s", rv.Version)
 				// Insert before rv
 				i.Versions = append(i.Versions[:idx], append([]ItemRevision{*rev}, i.Versions[idx:]...)...)
 				if idx == 0 {
@@ -163,7 +163,7 @@ func (i *Item) addNotLatestRevision(rev *ItemRevision, mode ReviseMode) {
 		rv := i.Versions[idx]
 		v, err := version.NewVersion(rv.Version)
 		if err != nil {
-			logs.Noticef("Cannot parse version: %s", rv.Version)
+			lv.Noticef("Cannot parse version: %s", rv.Version)
 			continue
 		}
 		if v.GreaterThan(newVer) {
