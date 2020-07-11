@@ -2,12 +2,11 @@ package cli
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"text/template"
 
-	"github.com/progrhyme/go-lv"
 	"github.com/progrhyme/binq/schema/item"
+	"github.com/progrhyme/go-lv"
 	"github.com/spf13/pflag"
 )
 
@@ -111,10 +110,10 @@ func (cmd *createCmd) run(args []string) (exit int) {
 	var replacements, extensions map[string]string
 	urlFormat = args[0]
 	if *opt.replacements != "" {
-		replacements = parseArgToStrMap(*opt.replacements)
+		replacements = parseArgToStrMap(*opt.replacements, "replacement")
 	}
 	if *opt.extensions != "" {
-		extensions = parseArgToStrMap(*opt.extensions)
+		extensions = parseArgToStrMap(*opt.extensions, "extension")
 	}
 
 	rev := &item.ItemRevision{
@@ -131,14 +130,9 @@ func (cmd *createCmd) run(args []string) (exit int) {
 	}
 
 	if *opt.file != "" {
-		file, err := os.OpenFile(*opt.file, os.O_WRONLY|os.O_TRUNC, 0666)
-		if err != nil {
-			fmt.Fprintf(cmd.errs, "Error! Can't open file: %s\n", *opt.file)
-			fmt.Fprintln(cmd.outs, string(gen))
-			return exitNG
-		}
-		fmt.Fprintln(file, string(gen))
-		fmt.Fprintf(cmd.errs, "Written %s\n", *opt.file)
+		writeFile(*opt.file, gen, func() {
+			fmt.Fprintf(cmd.errs, "Written %s\n", *opt.file)
+		})
 	} else {
 		fmt.Fprintln(cmd.outs, string(gen))
 	}
@@ -146,7 +140,7 @@ func (cmd *createCmd) run(args []string) (exit int) {
 	return exitOK
 }
 
-func parseArgToStrMap(arg string) (m map[string]string) {
+func parseArgToStrMap(arg, kind string) (m map[string]string) {
 	m = make(map[string]string)
 	for _, kv := range strings.Split(arg, ",") {
 		params := strings.Split(kv, ":")
@@ -154,7 +148,7 @@ func parseArgToStrMap(arg string) (m map[string]string) {
 		case 2:
 			m[params[0]] = params[1]
 		default:
-			lv.Warnf("Wrong argement for replacement: %s", kv)
+			lv.Warnf("Wrong argement for %s: %s", kind, kv)
 		}
 	}
 	return m

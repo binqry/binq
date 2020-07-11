@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"text/template"
 
-	"github.com/progrhyme/go-lv"
 	"github.com/progrhyme/binq/schema/item"
+	"github.com/progrhyme/go-lv"
 	"github.com/spf13/pflag"
 )
 
@@ -133,10 +133,10 @@ func (cmd *reviseCmd) run(args []string) (exit int) {
 
 	var replacements, extensions map[string]string
 	if *opt.replacements != "" {
-		replacements = parseArgToStrMap(*opt.replacements)
+		replacements = parseArgToStrMap(*opt.replacements, "replacement")
 	}
 	if *opt.extensions != "" {
-		extensions = parseArgToStrMap(*opt.extensions)
+		extensions = parseArgToStrMap(*opt.extensions, "extension")
 	}
 
 	mode := item.ReviseModeNatural
