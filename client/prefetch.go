@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"regexp"
 	"runtime"
 	"strings"
 
@@ -30,20 +31,29 @@ func (r *Runner) prefetch() (err error) {
 	// Use different timeout for index server
 	hc := NewHttpClient(httpTimeoutToQueryIndex)
 
-	tgt, _err := r.prefetchItemByURL(hc, r.Source)
+	name, version := parseSourceString(r.Source)
+	tgt, _err := r.prefetchItemByURL(hc, name)
 	switch _err {
 	case nil:
 		// OK
 	case errIndexDataNotFound:
 		// Retry
-		if tgt, err = r.prefetchItemByIndex(hc); err != nil {
+		if tgt, err = r.prefetchItemByIndex(hc, name); err != nil {
 			return err
 		}
 	default:
 		return _err
 	}
 
-	rev := tgt.GetLatest()
+	var rev *item.ItemRevision
+	if version == "" {
+		rev = tgt.GetLatest()
+	} else {
+		rev = tgt.GetRevision(version)
+	}
+	if rev == nil {
+		return fmt.Errorf("Version not found: %s", r.Source)
+	}
 	srcURL, err := rev.GetURL(item.ItemURLParam{OS: runtime.GOOS, Arch: runtime.GOARCH})
 	if err != nil {
 		return err
@@ -56,6 +66,16 @@ func (r *Runner) prefetch() (err error) {
 	r.sourceItem = rev
 
 	return nil
+}
+
+func parseSourceString(src string) (name, version string) {
+	re := regexp.MustCompile(`^([\w\-\./]+)@([\w\-\.]+)$`)
+	if re.MatchString(src) {
+		matched := re.FindStringSubmatch(src)
+		return matched[1], matched[2]
+	}
+
+	return src, ""
 }
 
 func (r *Runner) prefetchItemByURL(hc *http.Client, urlPath string) (tgt *item.Item, err error) {
@@ -108,7 +128,7 @@ func (r *Runner) prefetchItemByURL(hc *http.Client, urlPath string) (tgt *item.I
 	return tgt, nil
 }
 
-func (r *Runner) prefetchItemByIndex(hc *http.Client) (tgt *item.Item, err error) {
+func (r *Runner) prefetchItemByIndex(hc *http.Client, name string) (tgt *item.Item, err error) {
 	index, _err := r.prefetchIndex(hc, "")
 	switch _err {
 	case nil:
@@ -122,7 +142,7 @@ func (r *Runner) prefetchItemByIndex(hc *http.Client) (tgt *item.Item, err error
 		return tgt, err
 	}
 
-	urlPath := index.FindPath(r.Source)
+	urlPath := index.FindPath(name)
 	switch urlPath {
 	case "":
 		err = fmt.Errorf("Can't find item in index. Server: %s", r.ServerURL.String())

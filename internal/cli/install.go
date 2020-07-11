@@ -46,7 +46,7 @@ func (cmd *installCmd) usage(subcommand bool) {
   Download & extract binary or archive via HTTP; then locate executable files into target directory.
 
 Syntax:
-  {{.prog}} [{{.name}}] [-t|--target] SOURCE
+  {{.prog}} [{{.name}}] [-t|--target] SOURCE[@VERSION]
     [-d|--dir OUTPUT_DIR] [-f|--file OUTFILE] \
     [-s|--server SERVER] \
     [-z|--no-extract] [-X|--no-exec] \
@@ -62,7 +62,7 @@ Examples:
   # With index server
   {{.prog}} {{.name}} -s https://progrhy.me/binq-index peco -d path/to/bin
   export BINQ_SERVER=https://progrhy.me/binq-index
-  {{.prog}} jq -d path/to/bin -f jq
+  {{.prog}} jq@1.6 -d path/to/bin -f jq
 
 Options:
 `
