@@ -3,8 +3,11 @@
 
 # binq
 
-Download items via HTTP and extract them when compressed.  
-Mainly focuses on executable programs distributed on the internet.
+Download items via HTTP and extract them when they are compressed in forms of zip, tar.gz etc.  
+**binq** mainly focuses on executable programs distributed on the internet.
+
+Typical use case is fetching GitHub release assets.  
+But **binq** is not limited to it.
 
 # Install
 
@@ -98,7 +101,7 @@ export BINQ_BIN_DIR=path/to/bin
 binq jq@1.6 -f jq
 ```
 
-[Index Server](#binq-index-server) serves meta data of downloadable items by `binq`.  
+[Index Server](#binq-index-server) serves meta data of downloadable items by **binq**.  
 See following section for more details.
 
 Command specific options for `binq install`:
@@ -114,7 +117,7 @@ Command specific options for `binq install`:
 
 ## Manipulate Item JSON
 
-`binq` has some commands to create/edit **Item JSON** for [Binq Index Server](#binq-index-server).  
+**binq** has some commands to create/edit **Item JSON** for [Binq Index Server](#binq-index-server).  
 Each Item JSON represents a manifest to download & install item by `binq` command.  
 It includes followings:
 
@@ -144,8 +147,8 @@ binq revise ITEM_JSON_FILE VERSION --delete [-y|--yes] [GENERAL_OPTIONS]
 
 ## Manipulate Local Index Dataset
 
-You can interact with Index Dataset using `binq`, but currently CLI only supports Local Dataset in
-filesystem.
+You can interact with Index Dataset using `binq` command, but currently CLI only supports Local
+Dataset in filesystem.
 
 Commands Syntax:
 
@@ -164,12 +167,12 @@ binq deregister pato/to/root[/index.json] NAME [-y|--yes] [GENERAL_OPTIONS]
 
 # Binq Index Server
 
-`binq` refers to an index server to fetch meta data of an item when its identifier is specified
+**binq** can refer to an index server to fetch meta data of an item when its identifier is specified
 instead of full URL.  
 We call it **Binq Index Server**.
 
-It contains the dataset of downloadable items with their URLs for `binq`.  
-When `binq` send a request to the server, it responds a JSON data which contains information about
+It contains the dataset of items with their downloadable URLs.  
+When **binq** send a request to the server, it responds a JSON data which contains information of
 the item.
 
 A live example of index server is https://progrhy.me/binq-index/ .  
