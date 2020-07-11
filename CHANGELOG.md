@@ -1,3 +1,18 @@
+## 0.6.1 (2020-07-11)
+
+Feature: ([#7](https://github.com/progrhyme/binq/pull/7))
+
+- (CLI/install) Enable to specify download version by `@VERSION` suffix to source target argument
+- (CLI/install) Enable to specify default install directory by `$BINQ_BIN_DIR` environment variable
+
+Bug Fix: ([#7](https://github.com/progrhyme/binq/pull/7))
+
+- (CLI/new) Can't create a file with `-f|--file` option
+
+Other: ([#7](https://github.com/progrhyme/binq/pull/7))
+
+- (internal) Use github.com/progrhyme/go-lv package as logger instead of `internal/logs`
+
 ## 0.6.0 (2020-07-06)
 
 Feature: ([#6](https://github.com/progrhyme/binq/pull/6))

@@ -32,7 +32,7 @@ Typical commands to achieve this are following:
 
 ```sh
 bin=/usr/local/bin  # Change to your favorite path
-version=0.6.0       # Make sure this is the latest
+version=0.6.1       # Make sure this is the latest
 os=darwin           # or "linux" is supported
 tmpfile=$(mktemp)
 curl -Lo $tmpfile "https://github.com/progrhyme/binq/releases/download/v${version}/binq_${version}_${os}_amd64.zip"
