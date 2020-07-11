@@ -78,8 +78,12 @@ Parameters:
 
   Format: "<File1>:<Checksum1>[:<Algorithm1>],..."
 
-  SHA-256 is the default algorithm. To use CRC, specify like this: '-s "foo.zip:1093117945:crc"'.
+  SHA-256 is the default algorithm. To use CRC or MD5, specify suffix ":crc" or ":md5" like this:
+  '-s "foo.zip:5993c24b:crc"'.
   Other algorithm is not supported for now.
+
+Limitation:
+  It is not expected to specify two or more types of checksums per file.
 
 Options:
 `
