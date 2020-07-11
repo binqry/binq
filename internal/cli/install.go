@@ -2,8 +2,10 @@ package cli
 
 import (
 	"fmt"
+	"os"
 	"text/template"
 
+	"github.com/progrhyme/binq"
 	"github.com/progrhyme/binq/client"
 	"github.com/progrhyme/go-lv"
 	"github.com/spf13/pflag"
@@ -146,10 +148,14 @@ func (cmd *installCmd) run(args []string) (exit int) {
 	}
 	setLogLevelByOption(opt)
 
+	dir := os.Getenv(binq.EnvKeyBinDir)
+	if *opt.directory != "" {
+		dir = *opt.directory
+	}
 	opts := client.RunOption{
 		Mode:      mode,
 		Source:    source,
-		DestDir:   *opt.directory,
+		DestDir:   dir,
 		DestFile:  *opt.file,
 		Output:    cmd.errs,
 		LogLevel:  lv.GetLevel(),
