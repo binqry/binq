@@ -1,3 +1,13 @@
+## 0.6.2 (2020-07-12)
+
+Enhance: ([#8](https://github.com/progrhyme/binq/pull/8))
+
+- (checksum) Support MD5 checksum defined in RFC 1321
+
+Bug Fix: ([#8](https://github.com/progrhyme/binq/pull/8))
+
+- (checksum) `func (*item.ItemChecksum) SetSum` wrongly sets SHA256 value when CRC is expected
+
 ## 0.6.1 (2020-07-11)
 
 Feature: ([#7](https://github.com/progrhyme/binq/pull/7))
