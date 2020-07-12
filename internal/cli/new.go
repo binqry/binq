@@ -16,7 +16,7 @@ type createCmd struct {
 }
 
 type createOpts struct {
-	version, replacements, extensions, file *string
+	version, replacements, extensions, renameFiles, file *string
 	*commonOpts
 }
 
@@ -30,6 +30,7 @@ func newCreateCmd(common *commonCmd) (self *createCmd) {
 		file:         fs.StringP("file", "f", "", "# Output File name"),
 		replacements: fs.StringP("replace", "r", "", "# JSON parameter for \"replacements\""),
 		extensions:   fs.StringP("ext", "e", "", "# JSON parameter for \"extensions\""),
+		renameFiles:  fs.StringP("rename", "R", "", "# JSON parameter for \"rename-files\""),
 		commonOpts:   newCommonOpts(fs),
 	}
 	fs.Usage = self.usage
@@ -44,7 +45,8 @@ func (cmd *createCmd) usage() {
 
 Usage:
   <<.prog>> <<.name>> URL_FORMAT [-v|--version VERSION] [-f|--file OUTPUT_FILE] \
-    [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS] [GENERAL_OPTIONS]
+    [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS] [-R|--rename RENAME_FILES] \
+    [GENERAL_OPTIONS]
 
 Examples:
   <<.prog>> <<.name>> "https://github.com/rust-lang/mdBook/releases/download/v{{.Version}}/mdbook-v{{.Version}}-{{.Arch}}-{{.OS}}{{.Ext}}" \
@@ -107,7 +109,7 @@ func (cmd *createCmd) run(args []string) (exit int) {
 	setLogLevelByOption(opt)
 
 	var urlFormat string
-	var replacements, extensions map[string]string
+	var replacements, extensions, renameFiles map[string]string
 	urlFormat = args[0]
 	if *opt.replacements != "" {
 		replacements = parseArgToStrMap(*opt.replacements, "replacement")
@@ -115,12 +117,16 @@ func (cmd *createCmd) run(args []string) (exit int) {
 	if *opt.extensions != "" {
 		extensions = parseArgToStrMap(*opt.extensions, "extension")
 	}
+	if *opt.renameFiles != "" {
+		renameFiles = parseArgToStrMap(*opt.renameFiles, "rename-files")
+	}
 
 	rev := &item.ItemRevision{
 		URLFormat:    urlFormat,
 		Version:      *opt.version,
 		Replacements: replacements,
 		Extension:    extensions,
+		RenameFiles:  renameFiles,
 	}
 
 	gen, err := item.GenerateItemJSON(rev, true)

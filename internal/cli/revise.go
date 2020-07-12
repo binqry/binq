@@ -15,8 +15,8 @@ type reviseCmd struct {
 }
 
 type reviseOpts struct {
-	version, urlFormat, replacements, extensions, checksums *string
-	delete, latest, noLatest                                *bool
+	version, urlFormat, replacements, extensions, renameFiles, checksums *string
+	delete, latest, noLatest                                             *bool
 	*confirmOpts
 }
 
@@ -34,6 +34,7 @@ func newReviseCmd(common *commonCmd) (self *reviseCmd) {
 		urlFormat:    fs.StringP("url", "u", "", "# JSON parameter for \"url-format\""),
 		replacements: fs.StringP("replace", "r", "", "# JSON parameter for \"replacements\""),
 		extensions:   fs.StringP("ext", "e", "", "# JSON parameter for \"extensions\""),
+		renameFiles:  fs.StringP("rename", "R", "", "# JSON parameter for \"rename-files\""),
 		checksums:    fs.StringP("sum", "s", "", "# JSON parameter for \"checksums\""),
 		delete:       fs.Bool("delete", false, "# Delete version"),
 		latest:       fs.Bool("latest", false, "# Add or Update as Latest Version"),
@@ -57,7 +58,7 @@ Usage:
   # Add or Update Version
   <<.prog>> <<.name>> path/to/item.json [-v|--version] VERSION \
     [-s|--sum CHECKSUMS] [-u|--url URL_FORMAT] [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS] \
-    [--latest] [--no-latest] [-y|--yes] [GENERAL_OPTIONS]
+    [-R|--rename RENAME_FILES] [--latest] [--no-latest] [-y|--yes] [GENERAL_OPTIONS]
 
   # Delete Version
   <<.prog>> <<.name>> path/to/item.json VERSION --delete [-y|--yes] [GENERAL_OPTIONS]
@@ -135,12 +136,15 @@ func (cmd *reviseCmd) run(args []string) (exit int) {
 		return updateItemJSON(cmd, obj, file, orig)
 	}
 
-	var replacements, extensions map[string]string
+	var replacements, extensions, renameFiles map[string]string
 	if *opt.replacements != "" {
 		replacements = parseArgToStrMap(*opt.replacements, "replacement")
 	}
 	if *opt.extensions != "" {
 		extensions = parseArgToStrMap(*opt.extensions, "extension")
+	}
+	if *opt.renameFiles != "" {
+		renameFiles = parseArgToStrMap(*opt.renameFiles, "rename-files")
 	}
 
 	mode := item.ReviseModeNatural
@@ -156,6 +160,7 @@ func (cmd *reviseCmd) run(args []string) (exit int) {
 		URLFormat:    *opt.urlFormat,
 		Replacements: replacements,
 		Extension:    extensions,
+		RenameFiles:  renameFiles,
 	}
 
 	obj.AddOrUpdateRevision(rev, mode)
