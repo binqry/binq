@@ -8,7 +8,6 @@ import (
 	"net/url"
 	"path"
 	"regexp"
-	"runtime"
 	"strings"
 
 	"github.com/progrhyme/binq/internal/erron"
@@ -54,7 +53,7 @@ func (r *Runner) prefetch() (err error) {
 	if rev == nil {
 		return fmt.Errorf("Version not found: %s", r.Source)
 	}
-	srcURL, err := rev.GetURL(item.ItemURLParam{OS: runtime.GOOS, Arch: runtime.GOARCH})
+	srcURL, err := rev.GetURL(item.FormatParam{OS: r.os, Arch: r.arch})
 	if err != nil {
 		return err
 	}

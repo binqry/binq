@@ -130,12 +130,12 @@ Commands Syntax:
 ```sh
 # Generate Item JSON
 binq new URL_FORMAT [-v|--version VERSION] [-f|--file OUTPUT_FILE] \
-  [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS] [GENERAL_OPTIONS]
+  [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS] [-R|--rename RENAME_FILES] [GENERAL_OPTIONS]
 
 # Add or Update Version in Item JSON
 binq revise ITEM_JSON_FILE [-v|--version] VERSION \
   [-s|--sum CHECKSUMS] [-u|--url URL_FORMAT] [-r|--replace REPLACEMENTS] [-e|--ext EXTENSIONS] \
-  [--latest] [--no-latest] [-y|--yes] [GENERAL_OPTIONS]
+  [-R|--rename RENAME_FILES] [--latest] [--no-latest] [-y|--yes] [GENERAL_OPTIONS]
 
 # Download a Version in Item JSON and Verify its checksum
 binq verify path/to/item.json [-v|--version VERSION] [-o|--os OS] [-a|--arch ARCH] \

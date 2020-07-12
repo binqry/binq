@@ -13,6 +13,7 @@ func GenerateItemJSON(rev *ItemRevision, pretty bool) (b []byte, err error) {
 			URLFormat:    rev.URLFormat,
 			Replacements: rev.Replacements,
 			Extension:    rev.Extension,
+			RenameFiles:  rev.RenameFiles,
 		},
 		Latest: itemLatestRevision{Version: rev.Version},
 		Versions: []ItemRevision{

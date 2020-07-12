@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/mholt/archiver/v3"
@@ -35,6 +36,8 @@ type Runner struct {
 	httpClient *http.Client
 	sourceURL  string
 	sourceItem *item.ItemRevision
+	os         string
+	arch       string
 	tmpdir     string
 	download   string
 	extractDir string
@@ -60,6 +63,8 @@ func Run(opt RunOption) (err error) {
 		DestFile:   opt.DestFile,
 		Logger:     lv.New(opt.Output, opt.LogLevel, 0),
 		httpClient: NewHttpClient(DefaultHTTPTimeout),
+		os:         runtime.GOOS,
+		arch:       runtime.GOARCH,
 	}
 	if opt.Mode == 0 {
 		defaultRunner.Mode = ModeDefault
@@ -137,7 +142,12 @@ func (r *Runner) locate() (err error) {
 	if !r.extracted {
 		var dest string
 		if r.DestFile == "" {
-			dest = filepath.Join(r.DestDir, filepath.Base(r.download))
+			destFile := r.renameFileBySchema(filepath.Base(r.download))
+			if destFile != "" {
+				dest = filepath.Join(r.DestDir, destFile)
+			} else {
+				dest = filepath.Join(r.DestDir, filepath.Base(r.download))
+			}
 		} else {
 			dest = filepath.Join(r.DestDir, r.DestFile)
 		}
@@ -181,7 +191,13 @@ func (r *Runner) locate() (err error) {
 			return problem
 		}
 		if isExecutable(info.Mode()) {
-			dest := filepath.Join(r.DestDir, info.Name())
+			var dest string
+			destFile := r.renameFileBySchema(info.Name())
+			if destFile != "" {
+				dest = filepath.Join(r.DestDir, destFile)
+			} else {
+				dest = filepath.Join(r.DestDir, info.Name())
+			}
 			if _err := os.Rename(path, dest); _err != nil {
 				return erron.Errorwf(_err, "Failed to locate file: %s", dest)
 			}
@@ -207,6 +223,18 @@ func (r *Runner) locate() (err error) {
 	}
 
 	return err
+}
+
+func (r *Runner) renameFileBySchema(orig string) (tobe string) {
+	if r.sourceItem == nil {
+		return ""
+	}
+	param := item.FormatParam{OS: r.os, Arch: r.arch}
+	tobe = r.sourceItem.ConvertFileName(orig, param)
+	if tobe != "" {
+		r.Logger.Infof("Rename: %s => %s", orig, tobe)
+	}
+	return tobe
 }
 
 // TODO: Support Windows

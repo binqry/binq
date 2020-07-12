@@ -40,7 +40,7 @@ func (i *Item) Print(pretty bool) (b []byte, err error) {
 	return b, nil
 }
 
-func (i *Item) GetLatestURL(param ItemURLParam) (url string, err error) {
+func (i *Item) GetLatestURL(param FormatParam) (url string, err error) {
 	rev := i.GetLatest()
 	if rev == nil {
 		return "", nil
@@ -64,6 +64,7 @@ func (i *Item) GetLatest() (rev *ItemRevision) {
 		URLFormat:    i.Meta.URLFormat,
 		Replacements: i.Meta.Replacements,
 		Extension:    i.Meta.Extension,
+		RenameFiles:  i.Meta.RenameFiles,
 	}
 }
 
@@ -73,6 +74,7 @@ func (i *Item) GetRevision(version string) (rev *ItemRevision) {
 		URLFormat:    i.Meta.URLFormat,
 		Replacements: i.Meta.Replacements,
 		Extension:    i.Meta.Extension,
+		RenameFiles:  i.Meta.RenameFiles,
 	}
 
 	found := false
@@ -88,6 +90,9 @@ func (i *Item) GetRevision(version string) (rev *ItemRevision) {
 			}
 			if ver.Extension != nil {
 				tmp.Extension = ver.Extension
+			}
+			if ver.RenameFiles != nil {
+				tmp.Extension = ver.RenameFiles
 			}
 			break
 		}
