@@ -35,7 +35,7 @@ Typical commands to achieve this are following:
 
 ```sh
 bin=/usr/local/bin  # Change to your favorite path
-version=0.6.2       # Make sure this is the latest
+version=0.6.3       # Make sure this is the latest
 os=darwin           # or "linux" is supported
 tmpfile=$(mktemp)
 curl -Lo $tmpfile "https://github.com/progrhyme/binq/releases/download/v${version}/binq_${version}_${os}_amd64.zip"
@@ -95,10 +95,10 @@ binq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 \
   -d path/to/bin -f jq
 
 # With Index Server
-binq -s https://progrhy.me/binq-index peco -d path/to/bin
+binq -s https://progrhy.me/binq-index mdbook -d path/to/bin
 export BINQ_SERVER=https://progrhy.me/binq-index
 export BINQ_BIN_DIR=path/to/bin
-binq jq@1.6 -f jq
+binq jq@1.6
 ```
 
 [Index Server](#binq-index-server) serves meta data of downloadable items by **binq**.  

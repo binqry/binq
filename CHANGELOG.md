@@ -1,3 +1,18 @@
+## 0.6.3 (2020-07-12)
+
+Features: ([#9](https://github.com/progrhyme/binq/pull/9))
+
+- (schema,install) Add ".meta.rename-files" property to Item JSON to specify default file-renaming config
+- (CLI/new,revise) Add option `-R|--rename RENAME_FILES` to add "rename-files" JSON property
+
+Minor Change: ([#9](https://github.com/progrhyme/binq/pull/9))
+
+- (schema/item) Rename `item.ItemURLParam` to `FormatParam`
+
+Other: ([#9](https://github.com/progrhyme/binq/pull/9))
+
+- (test)(CLI/new,revise) Add some tests
+
 ## 0.6.2 (2020-07-12)
 
 Enhance: ([#8](https://github.com/progrhyme/binq/pull/8))
