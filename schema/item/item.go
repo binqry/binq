@@ -92,7 +92,7 @@ func (i *Item) GetRevision(version string) (rev *ItemRevision) {
 				tmp.Extension = ver.Extension
 			}
 			if ver.RenameFiles != nil {
-				tmp.Extension = ver.RenameFiles
+				tmp.RenameFiles = ver.RenameFiles
 			}
 			break
 		}
