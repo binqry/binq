@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/progrhyme/binq/internal/erron"
+	"github.com/progrhyme/go-lv"
 )
 
 type ItemRevision struct {
@@ -13,6 +14,7 @@ type ItemRevision struct {
 	URLFormat    string            `json:"url-format,omitempty"`
 	Replacements map[string]string `json:"replacements,omitempty"`
 	Extension    map[string]string `json:"extension,omitempty"`
+	RenameFiles  map[string]string `json:"rename-files,omitempty"`
 }
 
 func (rev *ItemRevision) GetChecksum(file string) (sum *ItemChecksum) {
@@ -34,7 +36,27 @@ func (rev *ItemRevision) AddOrSwapChecksum(sum *ItemChecksum) {
 	rev.Checksums = append(rev.Checksums, *sum)
 }
 
-func (rev *ItemRevision) GetURL(param ItemURLParam) (url string, err error) {
+func (rev *ItemRevision) GetURL(param FormatParam) (url string, err error) {
+	return rev.applyFormat(rev.URLFormat, param)
+}
+
+func (rev *ItemRevision) ConvertFileName(src string, param FormatParam) (dest string) {
+	for namef, val := range rev.RenameFiles {
+		name, err := rev.applyFormat(namef, param)
+		if err != nil {
+			lv.Errorf("%s", err)
+			continue
+		}
+		if name == src {
+			return val
+		}
+	}
+
+	// No rename
+	return ""
+}
+
+func (rev *ItemRevision) applyFormat(format string, param FormatParam) (applied string, err error) {
 	// Convert param into map to apply replacements
 	hash := make(map[string]string)
 	hash["Version"] = rev.Version
@@ -65,11 +87,11 @@ func (rev *ItemRevision) GetURL(param ItemURLParam) (url string, err error) {
 	}
 
 	var b strings.Builder
-	t := template.Must(template.New("url").Parse(rev.URLFormat))
+	t := template.Must(template.New("format").Parse(format))
 
 	if _err := t.Execute(&b, replaced); _err != nil {
 		err = erron.Errorwf(
-			_err, "Failed to exec template. Format: %s, Params: %v", rev.URLFormat, replaced)
+			_err, "Failed to exec template. Format: %s, Params: %v", format, replaced)
 		return "", err
 	}
 

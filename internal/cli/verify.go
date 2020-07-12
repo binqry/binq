@@ -14,8 +14,8 @@ import (
 
 	"github.com/progrhyme/binq/client"
 	"github.com/progrhyme/binq/internal/erron"
-	"github.com/progrhyme/go-lv"
 	"github.com/progrhyme/binq/schema/item"
+	"github.com/progrhyme/go-lv"
 	"github.com/spf13/pflag"
 )
 
@@ -216,7 +216,7 @@ func getItemRevisionByOpt(obj *item.Item, opt *verifyOpts) (rev *item.ItemRevisi
 	return rev, nil
 }
 
-func buildURLParamToVerify(opt *verifyOpts) (param item.ItemURLParam) {
+func buildURLParamToVerify(opt *verifyOpts) (param item.FormatParam) {
 	if *opt.os != "" {
 		param.OS = *opt.os
 	} else {

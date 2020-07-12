@@ -8,7 +8,7 @@ const (
 	ReviseModeOld
 )
 
-type ItemURLParam struct {
+type FormatParam struct {
 	Version string
 	OS      string
 	Arch    string
@@ -25,6 +25,7 @@ type itemMeta struct {
 	URLFormat    string            `json:"url-format,omitempty"`
 	Replacements map[string]string `json:"replacements,omitempty"`
 	Extension    map[string]string `json:"extension,omitempty"`
+	RenameFiles  map[string]string `json:"rename-files,omitempty"`
 }
 
 type itemLatestRevision struct {
