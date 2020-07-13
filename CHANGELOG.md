@@ -1,3 +1,11 @@
+## 0.7.0 (2020-07-13)
+
+Change:
+
+- Transfer repository from github.com/progrhyme/binq to github.com/binqry/binq for commonization
+
+No other code change is included.
+
 ## 0.6.3 (2020-07-12)
 
 Features: ([#9](https://github.com/binqry/binq/pull/9))
