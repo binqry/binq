@@ -141,6 +141,11 @@ func (cmd *modifyCmd) run(args []string) (exit int) {
 
 	oldPathItem = filepath.Join(filepath.Dir(fileIndex), oldPathItem)
 	newPathItem = filepath.Join(filepath.Dir(fileIndex), newPathItem)
+	newDir := filepath.Dir(newPathItem)
+	if err = os.MkdirAll(newDir, 0755); err != nil {
+		fmt.Fprintf(cmd.errs, "Error! Can't make directory: %s. %v\n", newDir, err)
+		return exitNG
+	}
 	if err = os.Rename(oldPathItem, newPathItem); err != nil {
 		fmt.Fprintf(cmd.errs, "Error! Failed to move file: %s => %s. %v\n", oldPathItem, newPathItem, err)
 		return exitNG
