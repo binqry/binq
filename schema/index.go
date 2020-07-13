@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/progrhyme/binq/internal/erron"
+	"github.com/binqry/binq/internal/erron"
 )
 
 type Index struct {

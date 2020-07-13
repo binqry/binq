@@ -12,9 +12,9 @@ import (
 	"runtime"
 	"text/template"
 
-	"github.com/progrhyme/binq/client"
-	"github.com/progrhyme/binq/internal/erron"
-	"github.com/progrhyme/binq/schema/item"
+	"github.com/binqry/binq/client"
+	"github.com/binqry/binq/internal/erron"
+	"github.com/binqry/binq/schema/item"
 	"github.com/progrhyme/go-lv"
 	"github.com/spf13/pflag"
 )

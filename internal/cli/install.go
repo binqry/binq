@@ -5,8 +5,8 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/progrhyme/binq"
-	"github.com/progrhyme/binq/client"
+	"github.com/binqry/binq"
+	"github.com/binqry/binq/client"
 	"github.com/progrhyme/go-lv"
 	"github.com/spf13/pflag"
 )
@@ -62,8 +62,8 @@ Examples:
     -d path/to/bin -f jq
 
   # With index server
-  {{.prog}} {{.name}} -s https://progrhy.me/binq-index peco -d path/to/bin
-  export BINQ_SERVER=https://progrhy.me/binq-index
+  {{.prog}} {{.name}} -s https://binqry.github.io/index peco -d path/to/bin
+  export BINQ_SERVER=https://binqry.github.io/index
   {{.prog}} jq@1.6 -d path/to/bin -f jq
 
 Options:

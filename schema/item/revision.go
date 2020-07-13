@@ -4,7 +4,7 @@ import (
 	"html/template"
 	"strings"
 
-	"github.com/progrhyme/binq/internal/erron"
+	"github.com/binqry/binq/internal/erron"
 	"github.com/progrhyme/go-lv"
 )
 

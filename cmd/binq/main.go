@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/progrhyme/binq/internal/cli"
+	"github.com/binqry/binq/internal/cli"
 )
 
 func main() {

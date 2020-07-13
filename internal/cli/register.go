@@ -10,8 +10,8 @@ import (
 	"text/template"
 
 	"github.com/progrhyme/go-lv"
-	"github.com/progrhyme/binq/schema"
-	"github.com/progrhyme/binq/schema/item"
+	"github.com/binqry/binq/schema"
+	"github.com/binqry/binq/schema/item"
 	"github.com/spf13/pflag"
 )
 

@@ -10,8 +10,8 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/progrhyme/binq/internal/erron"
-	"github.com/progrhyme/binq/schema/item"
+	"github.com/binqry/binq/internal/erron"
+	"github.com/binqry/binq/schema/item"
 )
 
 func (r *Runner) fetch() (err error) {

@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/progrhyme/binq/internal/erron"
-	"github.com/progrhyme/binq/schema/item"
+	"github.com/binqry/binq/internal/erron"
+	"github.com/binqry/binq/schema/item"
 	"golang.org/x/crypto/ssh/terminal"
 )
 

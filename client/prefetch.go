@@ -10,9 +10,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/progrhyme/binq/internal/erron"
-	"github.com/progrhyme/binq/schema"
-	"github.com/progrhyme/binq/schema/item"
+	"github.com/binqry/binq/internal/erron"
+	"github.com/binqry/binq/schema"
+	"github.com/binqry/binq/schema/item"
 )
 
 var errIndexDataNotFound = errors.New("Index Data is Not Found on given URL")

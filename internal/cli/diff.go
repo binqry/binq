@@ -7,7 +7,7 @@ import (
 
 	"github.com/gookit/color"
 	"github.com/pmezard/go-difflib/difflib"
-	"github.com/progrhyme/binq/internal/erron"
+	"github.com/binqry/binq/internal/erron"
 	"golang.org/x/crypto/ssh/terminal"
 )
 

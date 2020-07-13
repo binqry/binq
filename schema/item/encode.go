@@ -3,7 +3,7 @@ package item
 import (
 	"encoding/json"
 
-	"github.com/progrhyme/binq/internal/erron"
+	"github.com/binqry/binq/internal/erron"
 )
 
 func GenerateItemJSON(rev *ItemRevision, pretty bool) (b []byte, err error) {

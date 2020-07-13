@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/progrhyme/binq/internal/erron"
+	"github.com/binqry/binq/internal/erron"
 )
 
 func writeFile(file string, raw []byte, onSuccess func()) (err error) {

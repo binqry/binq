@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/progrhyme/binq"
+	"github.com/binqry/binq"
 )
 
 type testCaseRun struct {

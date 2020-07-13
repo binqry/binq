@@ -1,4 +1,4 @@
-module github.com/progrhyme/binq
+module github.com/binqry/binq
 
 go 1.14
 

@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/progrhyme/binq/internal/erron"
-	"github.com/progrhyme/binq/schema"
+	"github.com/binqry/binq/internal/erron"
+	"github.com/binqry/binq/schema"
 	"github.com/spf13/pflag"
 	"golang.org/x/crypto/ssh/terminal"
 )

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"text/template"
 
-	"github.com/progrhyme/binq/schema/item"
+	"github.com/binqry/binq/schema/item"
 	"github.com/progrhyme/go-lv"
 	"github.com/spf13/pflag"
 )

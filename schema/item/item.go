@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/go-version"
-	"github.com/progrhyme/binq/internal/erron"
+	"github.com/binqry/binq/internal/erron"
 	"github.com/progrhyme/go-lv"
 )
 

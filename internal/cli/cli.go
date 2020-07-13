@@ -6,7 +6,7 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/progrhyme/binq"
+	"github.com/binqry/binq"
 	"github.com/progrhyme/go-lv"
 )
 

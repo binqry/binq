@@ -11,9 +11,9 @@ import (
 	"strings"
 
 	"github.com/mholt/archiver/v3"
-	"github.com/progrhyme/binq"
-	"github.com/progrhyme/binq/internal/erron"
-	"github.com/progrhyme/binq/schema/item"
+	"github.com/binqry/binq"
+	"github.com/binqry/binq/internal/erron"
+	"github.com/binqry/binq/schema/item"
 	"github.com/progrhyme/go-lv"
 )
 
