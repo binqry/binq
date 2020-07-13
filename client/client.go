@@ -10,10 +10,10 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/mholt/archiver/v3"
 	"github.com/binqry/binq"
 	"github.com/binqry/binq/internal/erron"
 	"github.com/binqry/binq/schema/item"
+	"github.com/mholt/archiver/v3"
 	"github.com/progrhyme/go-lv"
 )
 
