@@ -45,6 +45,10 @@ func (c *CLI) Run(args []string) (exit int) {
 	switch args[1] {
 	case "install":
 		return installer.run(args[1:])
+	case "index":
+		lister := newIndexCmd(common)
+		lister.name = "index"
+		return lister.run(args[2:])
 	case "new":
 		creator := newCreateCmd(common)
 		creator.name = "new"

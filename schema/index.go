@@ -3,6 +3,7 @@ package schema
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/binqry/binq/internal/erron"
 )
@@ -43,6 +44,17 @@ func (idx *Index) ToJSON(pretty bool) (b []byte, err error) {
 		return b, erron.Errorwf(_err, "Failed to marshal JSON: %s", idx)
 	}
 	return b, nil
+}
+
+func (idx *Index) ToText() (text string) {
+	format := "%-16s    %-48s"
+	a := make([]string, len(idx.Items)+1)
+	a = []string{fmt.Sprintf(format, "Name", "Path")}
+	a = append(a, fmt.Sprint(strings.Repeat("=", 68)))
+	for _, i := range idx.Items {
+		a = append(a, fmt.Sprintf(format, i.Name, i.Path))
+	}
+	return strings.Join(a, "\n") + "\n"
 }
 
 func (idx *Index) Find(name string) (indice *IndiceItem) {

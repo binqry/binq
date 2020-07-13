@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/binqry/binq"
+	"github.com/binqry/binq/schema"
 )
 
 type testCaseRun struct {
@@ -65,6 +66,10 @@ func buildTestRunAllCases(prog string) []testCaseRun {
 	invalidFlg := "--no-such-option"
 	flagError := fmt.Sprintf("Error! Parsing arguments failed. unknown flag: %s", invalidFlg)
 
+	indexOutText := strings.TrimRight(schema.NewIndex().ToText(), "\n")
+	indexOutJSON := `{
+  "items": [`
+
 	return []testCaseRun{
 		// Without subcommand (but install)
 		{args: []string{}, exit: exitNG, outStr: "", errStr: commands["root"].helpText},
@@ -86,6 +91,16 @@ func buildTestRunAllCases(prog string) []testCaseRun {
 		{
 			args: []string{"install"}, exit: exitNG, outStr: "",
 			errStr: strings.Join([]string{"Error! Target is not specified!", commands["install"].helpText}, "\n"),
+		},
+
+		// index
+		{args: []string{"index", "--help"}, exit: exitOK, outStr: "", errStr: commands["index"].helpText},
+		{args: []string{"index", invalidFlg}, exit: exitNG, outStr: "", errStr: flagError},
+		{args: []string{"index"}, exit: exitOK, outStr: indexOutText, errStr: ""},
+		{args: []string{"index", "--output", "json"}, exit: exitOK, outStr: indexOutJSON, errStr: ""},
+		{
+			args: []string{"index", "--output", "no-such-fmt"}, exit: exitOK,
+			outStr: indexOutText, errStr: "[NOTICE] Unknown output format: no-such-fmt",
 		},
 
 		// new
@@ -202,6 +217,11 @@ Usage:`, prog)}
   Download & extract binary or archive via HTTP; then locate executable files into target directory.
 
 Syntax:`}
+
+	info["index"] = testCommandInfo{`Summary:
+  List items on binq index server.
+
+Usage:`}
 
 	info["new"] = testCommandInfo{fmt.Sprintf(`Summary:
   Generate a template Item JSON for %s.

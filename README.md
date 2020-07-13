@@ -64,6 +64,7 @@ binq [install] [-t|--target] SOURCE[@VERSION] \
   [GENERAL_OPTIONS]
 
 # Other Commands
+binq index       # List Items on Index Server
 binq new         # Create Item JSON for Index Server
 binq revise      # Add/Edit/Delete a version in Item JSON
 binq verify      # Verify checksum of a version in item JSON
