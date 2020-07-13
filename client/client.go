@@ -77,6 +77,8 @@ func Run(opt RunOption) (err error) {
 		urlStr = opt.ServerURL
 	} else if server := os.Getenv(binq.EnvKeyServer); server != "" {
 		urlStr = server
+	} else {
+		urlStr = binq.DefaultBinqServer
 	}
 	if urlStr != "" {
 		uri, _err := url.Parse(urlStr)
