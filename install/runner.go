@@ -32,7 +32,7 @@ type Runner struct {
 	Source     string
 	DestDir    string
 	DestFile   string
-	Logger     lv.Loggable
+	Logger     lv.Granular
 	ServerURL  *url.URL
 	httpClient *http.Client
 	sourceURL  string
