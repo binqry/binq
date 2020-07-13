@@ -132,7 +132,7 @@ func (cmd *verifyCmd) run(args []string) (exit int) {
 		return exitNG
 	}
 
-	hc := client.NewHttpClient(client.DefaultHTTPTimeout)
+	hc := client.NewDefaultHttpClient()
 
 	res, err := hc.Do(req)
 	if err != nil {

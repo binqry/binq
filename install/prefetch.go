@@ -1,4 +1,4 @@
-package client
+package install
 
 import (
 	"errors"
@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/binqry/binq/client"
 	"github.com/binqry/binq/internal/erron"
 	"github.com/binqry/binq/schema"
 	"github.com/binqry/binq/schema/item"
@@ -28,7 +29,7 @@ func (r *Runner) prefetch() (err error) {
 	}
 
 	// Use different timeout for index server
-	hc := NewHttpClient(httpTimeoutToQueryIndex)
+	hc := client.NewHttpClientForIndex()
 
 	name, version := parseSourceString(r.Source)
 	tgt, _err := r.prefetchItemByURL(hc, name)
@@ -88,7 +89,7 @@ func (r *Runner) prefetchItemByURL(hc *http.Client, urlPath string) (tgt *item.I
 
 	headers := make(map[string]string)
 	headers["Accept"] = "application/json"
-	req, err := NewHttpGetRequest(urlItem.String(), headers)
+	req, err := client.NewHttpGetRequest(urlItem.String(), headers)
 	if err != nil {
 		return tgt, err
 	}
@@ -169,7 +170,7 @@ func (r *Runner) prefetchIndex(hc *http.Client, url string) (index *schema.Index
 	}
 	headers := make(map[string]string)
 	headers["Accept"] = "application/json"
-	req, err := NewHttpGetRequest(url, headers)
+	req, err := client.NewHttpGetRequest(url, headers)
 	if err != nil {
 		return index, err
 	}

@@ -6,7 +6,7 @@ import (
 	"text/template"
 
 	"github.com/binqry/binq"
-	"github.com/binqry/binq/client"
+	"github.com/binqry/binq/install"
 	"github.com/progrhyme/go-lv"
 	"github.com/spf13/pflag"
 )
@@ -134,15 +134,15 @@ func (cmd *installCmd) run(args []string) (exit int) {
 		return exitNG
 	}
 
-	mode := client.ModeDefault
+	mode := install.ModeDefault
 	if *opt.noExtract {
-		mode = mode ^ client.ModeExtract
+		mode = mode ^ install.ModeExtract
 	}
 	if *opt.noExec {
-		mode = mode ^ client.ModeExecutable
+		mode = mode ^ install.ModeExecutable
 	}
 	if mode == 0 {
-		mode = client.ModeDLOnly
+		mode = install.ModeDLOnly
 	}
 
 	var source string
@@ -157,7 +157,7 @@ func (cmd *installCmd) run(args []string) (exit int) {
 	if *opt.directory != "" {
 		dir = *opt.directory
 	}
-	opts := client.RunOption{
+	opts := install.RunOption{
 		Mode:      mode,
 		Source:    source,
 		DestDir:   dir,
@@ -166,7 +166,7 @@ func (cmd *installCmd) run(args []string) (exit int) {
 		LogLevel:  lv.GetLevel(),
 		ServerURL: *opt.server,
 	}
-	if err := client.Run(opts); err != nil {
+	if err := install.Run(opts); err != nil {
 		fmt.Fprintf(cmd.errs, "Error! %v\n", err)
 		return exitNG
 	}
