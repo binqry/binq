@@ -11,7 +11,7 @@ import (
 )
 
 type modifyCmd struct {
-	*indexCmd
+	*indiceCmd
 	option *modifyOpts
 }
 
@@ -25,7 +25,7 @@ func (cmd *modifyCmd) getConfirmOpts() confirmFlavor {
 }
 
 func newModifyCmd(common *commonCmd) (self *modifyCmd) {
-	self = &modifyCmd{indexCmd: &indexCmd{
+	self = &modifyCmd{indiceCmd: &indiceCmd{
 		confirmCmd: &confirmCmd{
 			commonCmd: common,
 		},
@@ -36,7 +36,7 @@ func newModifyCmd(common *commonCmd) (self *modifyCmd) {
 	self.option = &modifyOpts{
 		newName:     fs.StringP("name", "n", "", "# New Name for the Item"),
 		path:        fs.StringP("path", "p", "", "# New Path for the Item"),
-		confirmOpts: newIndexOpts(fs),
+		confirmOpts: newIndiceOpts(fs),
 	}
 	fs.Usage = self.usage
 	self.flags = fs

@@ -14,30 +14,31 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-type indexRunner interface {
+// For index manipulator commands: "register", "modify", "deregister"
+type indiceRunner interface {
 	confirmRunner
 	getPrevRawIndex() []byte
 	setPrevRawIndex([]byte)
 }
 
-type indexFlavor interface {
+type indiceFlavor interface {
 	getYes() *bool
 }
 
-type indexCmd struct {
+type indiceCmd struct {
 	prevRawIndex []byte
 	*confirmCmd
 }
 
-func (cmd *indexCmd) getPrevRawIndex() (b []byte) {
+func (cmd *indiceCmd) getPrevRawIndex() (b []byte) {
 	return cmd.prevRawIndex
 }
 
-func (cmd *indexCmd) setPrevRawIndex(b []byte) {
+func (cmd *indiceCmd) setPrevRawIndex(b []byte) {
 	cmd.prevRawIndex = b
 }
 
-func newIndexOpts(fs *pflag.FlagSet) (opt *confirmOpts) {
+func newIndiceOpts(fs *pflag.FlagSet) (opt *confirmOpts) {
 	return &confirmOpts{
 		yes:        fs.BoolP("yes", "y", false, "# Update Index data without confirmation"),
 		commonOpts: newCommonOpts(fs),
@@ -57,7 +58,7 @@ func resolveIndexPathByArg(arg string) (pathIndex string, err error) {
 	return pathIndex, err
 }
 
-func decodeIndex(cmd indexRunner, file string) (idx *schema.Index, err error) {
+func decodeIndex(cmd indiceRunner, file string) (idx *schema.Index, err error) {
 	if _, _err := os.Stat(file); os.IsNotExist(_err) {
 		err = fmt.Errorf("Index file not found: %s", file)
 		return idx, err
@@ -79,7 +80,7 @@ func decodeIndex(cmd indexRunner, file string) (idx *schema.Index, err error) {
 	return idx, nil
 }
 
-func writeNewIndex(cmd indexRunner, idx *schema.Index, fileIndex string) (err error) {
+func writeNewIndex(cmd indiceRunner, idx *schema.Index, fileIndex string) (err error) {
 	newRawIndex, _err := idx.Print(true)
 	if _err != nil {
 		return erron.Errorwf(_err, "Failed to encode new Index")

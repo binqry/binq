@@ -10,11 +10,11 @@ import (
 )
 
 type deregisterCmd struct {
-	*indexCmd
+	*indiceCmd
 }
 
 func newDeregisterCmd(common *commonCmd) (self *deregisterCmd) {
-	self = &deregisterCmd{indexCmd: &indexCmd{
+	self = &deregisterCmd{indiceCmd: &indiceCmd{
 		confirmCmd: &confirmCmd{
 			commonCmd: common,
 		},
@@ -22,7 +22,7 @@ func newDeregisterCmd(common *commonCmd) (self *deregisterCmd) {
 
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
-	self.option = newIndexOpts(fs)
+	self.option = newIndiceOpts(fs)
 	fs.Usage = self.usage
 	self.flags = fs
 

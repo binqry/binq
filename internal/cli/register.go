@@ -16,7 +16,7 @@ import (
 )
 
 type registerCmd struct {
-	*indexCmd
+	*indiceCmd
 	option *registerOpts
 }
 
@@ -30,7 +30,7 @@ func (cmd *registerCmd) getConfirmOpts() confirmFlavor {
 }
 
 func newRegisterCmd(common *commonCmd) (self *registerCmd) {
-	self = &registerCmd{indexCmd: &indexCmd{
+	self = &registerCmd{indiceCmd: &indiceCmd{
 		confirmCmd: &confirmCmd{
 			commonCmd: common,
 		},
@@ -41,7 +41,7 @@ func newRegisterCmd(common *commonCmd) (self *registerCmd) {
 	self.option = &registerOpts{
 		name:        fs.StringP("name", "n", "", "# Identical name for Item in Index"),
 		path:        fs.StringP("path", "p", "", "# Path for Item in Index"),
-		confirmOpts: newIndexOpts(fs),
+		confirmOpts: newIndiceOpts(fs),
 	}
 	fs.Usage = self.usage
 	self.flags = fs
