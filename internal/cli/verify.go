@@ -12,7 +12,7 @@ import (
 	"runtime"
 	"text/template"
 
-	"github.com/binqry/binq/client"
+	"github.com/binqry/binq/client/http"
 	"github.com/binqry/binq/internal/erron"
 	"github.com/binqry/binq/schema/item"
 	"github.com/progrhyme/go-lv"
@@ -126,15 +126,7 @@ func (cmd *verifyCmd) run(args []string) (exit int) {
 	}
 	fmt.Fprintf(cmd.outs, "GET %s\n", urlStr)
 
-	req, err := client.NewHttpGetRequest(urlStr, map[string]string{})
-	if err != nil {
-		fmt.Fprintf(cmd.errs, "Error! Failed to create HTTP request. %v\n", err)
-		return exitNG
-	}
-
-	hc := client.NewDefaultHttpClient()
-
-	res, err := hc.Do(req)
+	res, err := http.Fetch(urlStr)
 	if err != nil {
 		fmt.Fprintf(cmd.errs, "Error! Failed to execute HTTP request. %v\n", err)
 		return exitNG

@@ -3,7 +3,6 @@ package install
 import (
 	"fmt"
 	"io"
-	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -34,7 +33,7 @@ type Runner struct {
 	DestFile   string
 	Logger     lv.Granular
 	ServerURL  *url.URL
-	httpClient *http.Client
+	clt        *client.Client
 	sourceURL  string
 	sourceItem *item.ItemRevision
 	os         string
@@ -58,14 +57,14 @@ type RunOption struct {
 var defaultRunner Runner
 
 func Run(opt RunOption) (err error) {
+	logger := lv.New(opt.Output, opt.LogLevel, 0)
 	defaultRunner = Runner{
-		Source:     opt.Source,
-		DestDir:    opt.DestDir,
-		DestFile:   opt.DestFile,
-		Logger:     lv.New(opt.Output, opt.LogLevel, 0),
-		httpClient: client.NewDefaultHttpClient(),
-		os:         runtime.GOOS,
-		arch:       runtime.GOARCH,
+		Source:   opt.Source,
+		DestDir:  opt.DestDir,
+		DestFile: opt.DestFile,
+		Logger:   logger,
+		os:       runtime.GOOS,
+		arch:     runtime.GOARCH,
 	}
 	if opt.Mode == 0 {
 		defaultRunner.Mode = ModeDefault
@@ -81,13 +80,11 @@ func Run(opt RunOption) (err error) {
 	} else {
 		urlStr = binq.DefaultBinqServer
 	}
-	if urlStr != "" {
-		uri, _err := url.Parse(urlStr)
-		if _err != nil {
-			return erron.Errorwf(_err, "Failed to parse server URL: %s", urlStr)
-		}
-		defaultRunner.ServerURL = uri
+	uri, _err := url.Parse(urlStr)
+	if _err != nil {
+		return erron.Errorwf(_err, "Failed to parse server URL: %s", urlStr)
 	}
+	defaultRunner.ServerURL = uri
 
 	return defaultRunner.Run()
 }
@@ -226,6 +223,13 @@ func (r *Runner) locate() (err error) {
 	}
 
 	return err
+}
+
+func (r *Runner) getClient() (c *client.Client) {
+	if r.clt == nil {
+		r.clt = client.NewClient(r.ServerURL, r.Logger)
+	}
+	return r.clt
 }
 
 func (r *Runner) renameFileBySchema(orig string) (tobe string) {

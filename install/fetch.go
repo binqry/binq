@@ -10,7 +10,7 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/binqry/binq/client"
+	"github.com/binqry/binq/client/http"
 	"github.com/binqry/binq/internal/erron"
 	"github.com/binqry/binq/schema/item"
 )
@@ -19,12 +19,8 @@ func (r *Runner) fetch() (err error) {
 	if r.sourceURL == "" {
 		return fmt.Errorf("Can't fetch because sourceURL is not set. Source: %s", r.Source)
 	}
-	req, err := client.NewHttpGetRequest(r.sourceURL, map[string]string{})
-	if err != nil {
-		return err
-	}
 	r.Logger.Printf("GET %s", r.sourceURL)
-	res, _err := r.httpClient.Do(req)
+	res, _err := http.Fetch(r.sourceURL)
 	if _err != nil {
 		return erron.Errorwf(_err, "Failed to execute HTTP request")
 	}
