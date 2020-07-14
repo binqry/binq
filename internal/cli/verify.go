@@ -43,7 +43,7 @@ func newVerifyCmd(common *commonCmd) (self *verifyCmd) {
 	fs.SetOutput(self.errs)
 	self.option = &verifyOpts{
 		version: fs.StringP("version", "v", "", "# JSON parameter for \"version\""),
-		os:      fs.StringP("os", "o", "", "# JSON parameter for \"{{.OS}}\""),
+		os:      fs.String("os", "", "# JSON parameter for \"{{.OS}}\""),
 		arch:    fs.StringP("arch", "a", "", "# JSON parameter for \"{{.Arch}}\""),
 		keep:    fs.Bool("keep", false, "# Delete version"),
 		confirmOpts: &confirmOpts{
@@ -63,7 +63,7 @@ func (cmd *verifyCmd) usage() {
   And update the checksum when needed.
 
 Usage:
-  <<.prog>> <<.name>> path/to/item.json [-v|--version VERSION] [-o|--os OS] [-a|--arch ARCH] \
+  <<.prog>> <<.name>> path/to/item.json [-v|--version VERSION] [--os OS] [-a|--arch ARCH] \
     [-y|--yes] [--keep] [GENERAL_OPTIONS]
 
 When VERSION argument is omitted, the latest version will be verified.

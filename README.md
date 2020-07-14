@@ -141,7 +141,7 @@ binq revise ITEM_JSON_FILE [-v|--version] VERSION \
   [-R|--rename RENAME_FILES] [--latest] [--no-latest] [-y|--yes] [GENERAL_OPTIONS]
 
 # Download a Version in Item JSON and Verify its checksum
-binq verify path/to/item.json [-v|--version VERSION] [-o|--os OS] [-a|--arch ARCH] \
+binq verify path/to/item.json [-v|--version VERSION] [--os OS] [-a|--arch ARCH] \
   [-y|--yes] [--keep] [GENERAL_OPTIONS]
 
 # Delete Version in Item JSON
