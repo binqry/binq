@@ -9,9 +9,9 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/progrhyme/go-lv"
 	"github.com/binqry/binq/schema"
 	"github.com/binqry/binq/schema/item"
+	"github.com/progrhyme/go-lv"
 	"github.com/spf13/pflag"
 )
 

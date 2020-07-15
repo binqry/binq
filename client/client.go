@@ -10,10 +10,10 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/mholt/archiver/v3"
 	"github.com/binqry/binq"
 	"github.com/binqry/binq/internal/erron"
 	"github.com/binqry/binq/schema/item"
+	"github.com/mholt/archiver/v3"
 	"github.com/progrhyme/go-lv"
 )
 
@@ -77,6 +77,8 @@ func Run(opt RunOption) (err error) {
 		urlStr = opt.ServerURL
 	} else if server := os.Getenv(binq.EnvKeyServer); server != "" {
 		urlStr = server
+	} else {
+		urlStr = binq.DefaultBinqServer
 	}
 	if urlStr != "" {
 		uri, _err := url.Parse(urlStr)

@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/hashicorp/go-version"
 	"github.com/binqry/binq/internal/erron"
+	"github.com/hashicorp/go-version"
 	"github.com/progrhyme/go-lv"
 )
 
