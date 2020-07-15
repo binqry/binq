@@ -1,8 +1,30 @@
+## 0.7.2 (2020-07-16)
+
+Feature: ([#11](https://github.com/binqry/binq/pull/11))
+
+- (CLI) Add `index` subcommand to list Items on Index Server
+
+Changes: ([#11](https://github.com/binqry/binq/pull/11))
+
+- (client) Reorganize packages:
+  - Divide "client" package into "install", "client", "client/http" packages.
+  - New "install" package implements installation functionality like "client" did so far.
+  - New "client" package provides high-level HTTP client to query Index Server.
+  - New "client/http" package implements handy HTTP client functionality
+- (CLI/verify) Omit `-o` short-option to specify OS parameter.
+- (schema) Rename `schema.Index.Print` to `ToJSON`.
+
+Other: ([#11](https://github.com/binqry/binq/pull/11))
+
+- (CD) Add shell script to generate release note.
+- Update dependency:
+  - `github.com/progrhyme/go-lv`: v0.3.1 -> v0.4.1
+
 ## 0.7.1 (2020-07-15)
 
 Feature / Change: ([#10](https://github.com/binqry/binq/pull/10))
 
-- - (client, CLI/install) Set default index server to https://binqry.github.io/index/
+- (client, CLI/install) Set default index server to https://binqry.github.io/index/
 
 Bug Fix: ([#10](https://github.com/binqry/binq/pull/10))
 
