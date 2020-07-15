@@ -81,7 +81,7 @@ func decodeIndex(cmd indiceRunner, file string) (idx *schema.Index, err error) {
 }
 
 func writeNewIndex(cmd indiceRunner, idx *schema.Index, fileIndex string) (err error) {
-	newRawIndex, _err := idx.Print(true)
+	newRawIndex, _err := idx.ToJSON(true)
 	if _err != nil {
 		return erron.Errorwf(_err, "Failed to encode new Index")
 	}

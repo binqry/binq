@@ -32,7 +32,7 @@ func (idx *Index) String() string {
 	return fmt.Sprintf("%+v", *idx.indexProps)
 }
 
-func (idx *Index) Print(pretty bool) (b []byte, err error) {
+func (idx *Index) ToJSON(pretty bool) (b []byte, err error) {
 	var _err error
 	if pretty {
 		b, _err = json.MarshalIndent(idx, "", "  ")
