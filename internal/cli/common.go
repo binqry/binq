@@ -51,13 +51,19 @@ func newCommonOpts(fs *pflag.FlagSet) *commonOpts {
 	}
 }
 
-func setLogLevelByOption(opt flavor) {
-	if *opt.getLogLevel() != "" {
-		level := lv.WordToLevel(*opt.getLogLevel())
-		if level == 0 {
-			lv.Warnf("Unknown log level: %s. Use default", *opt.getLogLevel())
-		} else {
-			lv.SetLevel(level)
-		}
+func logLevelByOption(opt flavor) (level lv.Level) {
+	if *opt.getLogLevel() == "" {
+		return defaultLogLevel
 	}
+
+	level = lv.WordToLevel(*opt.getLogLevel())
+	if level == 0 {
+		lv.Warnf("Unknown log level: %s. Use default", *opt.getLogLevel())
+		return defaultLogLevel
+	}
+	return level
+}
+
+func setLogLevelByOption(opt flavor) {
+	lv.SetLevel(logLevelByOption(opt))
 }

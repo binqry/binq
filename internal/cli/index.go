@@ -2,11 +2,8 @@ package cli
 
 import (
 	"fmt"
-	"net/url"
 	"text/template"
 
-	"github.com/binqry/binq"
-	"github.com/binqry/binq/client"
 	"github.com/progrhyme/go-lv"
 	"github.com/spf13/pflag"
 )
@@ -17,24 +14,27 @@ const (
 )
 
 type indexCmd struct {
-	*commonCmd
+	*clientCmd
 	option *indexOpts
 }
 
 type indexOpts struct {
-	server, outfmt *string
-	*commonOpts
+	outfmt *string
+	*clientOpts
+}
+
+func (cmd *indexCmd) getClientOpts() clientFlavor {
+	return cmd.option
 }
 
 func newIndexCmd(common *commonCmd) (self *indexCmd) {
-	self = &indexCmd{commonCmd: common}
+	self = &indexCmd{clientCmd: &clientCmd{commonCmd: common}}
 
 	fs := pflag.NewFlagSet(self.name, pflag.ContinueOnError)
 	fs.SetOutput(self.errs)
 	self.option = &indexOpts{
-		server:     fs.StringP("server", "s", "", "# Index Server URL"),
 		outfmt:     fs.StringP("output", "o", "", "# Output format (text,json)"),
-		commonOpts: newCommonOpts(fs),
+		clientOpts: newClientOpts(fs),
 	}
 	fs.Usage = self.usage
 	self.flags = fs
@@ -69,26 +69,14 @@ func (cmd *indexCmd) run(args []string) (exit int) {
 		return exitOK
 	}
 	setLogLevelByOption(opt)
-	server := *opt.server
-	if server == "" {
-		server = binq.DefaultBinqServer
-	}
-	level := lv.GetLevel()
-	if *opt.logLv != "" {
-		level = lv.WordToLevel(*opt.logLv)
-	}
-	logger := lv.New(cmd.errs, level, 0)
-	svrURL, err := url.Parse(server)
+
+	clt, err := getClient(cmd)
 	if err != nil {
-		fmt.Fprintf(cmd.errs, "Error! URL parse failed. %v\n", err)
 		return exitNG
 	}
-	lv.Debugf("Server URL: %s", svrURL)
-
-	clt := client.NewClient(svrURL, logger)
 	index, err := clt.GetIndex()
 	if err != nil {
-		fmt.Fprintf(cmd.errs, "Error! Can't get index data. Server: %s, Error: %v\n", server, err)
+		fmt.Fprintf(cmd.errs, "Error! Can't get index data. Server: %s, Error: %v\n", cmd.server, err)
 		return exitNG
 	}
 
