@@ -17,15 +17,6 @@ import (
 	"github.com/progrhyme/go-lv"
 )
 
-type Mode int
-
-const (
-	ModeDLOnly Mode = 1 << iota
-	ModeExtract
-	ModeExecutable
-	ModeDefault = ModeExtract | ModeExecutable
-)
-
 type Runner struct {
 	Mode       Mode
 	Source     string
@@ -33,6 +24,7 @@ type Runner struct {
 	DestFile   string
 	Logger     lv.Granular
 	ServerURL  *url.URL
+	NewerThan  string
 	clt        *client.Client
 	sourceURL  string
 	sourceItem *item.ItemRevision
@@ -52,6 +44,7 @@ type RunOption struct {
 	Output    io.Writer
 	LogLevel  lv.Level
 	ServerURL string
+	NewerThan string
 }
 
 var defaultRunner Runner
@@ -59,12 +52,13 @@ var defaultRunner Runner
 func Run(opt RunOption) (err error) {
 	logger := lv.New(opt.Output, opt.LogLevel, 0)
 	defaultRunner = Runner{
-		Source:   opt.Source,
-		DestDir:  opt.DestDir,
-		DestFile: opt.DestFile,
-		Logger:   logger,
-		os:       runtime.GOOS,
-		arch:     runtime.GOARCH,
+		Source:    opt.Source,
+		DestDir:   opt.DestDir,
+		DestFile:  opt.DestFile,
+		Logger:    logger,
+		NewerThan: opt.NewerThan,
+		os:        runtime.GOOS,
+		arch:      runtime.GOARCH,
 	}
 	if opt.Mode == 0 {
 		defaultRunner.Mode = ModeDefault
