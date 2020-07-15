@@ -35,7 +35,7 @@ Typical commands to achieve this are following:
 
 ```sh
 bin=/usr/local/bin  # Change to your favorite path
-version=0.7.0       # Make sure this is the latest
+version=0.7.1       # Make sure this is the latest
 os=darwin           # or "linux" is supported
 tmpfile=$(mktemp)
 curl -Lo $tmpfile "https://github.com/binqry/binq/releases/download/v${version}/binq_${version}_${os}_amd64.zip"
@@ -94,11 +94,14 @@ binq https://github.com/peco/peco/releases/download/v0.5.7/peco_darwin_amd64.zip
 binq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 \
   -d path/to/bin -f jq
 
-# With Index Server
-binq -s https://binqry.github.io/index/ mdbook -d path/to/bin
-export BINQ_SERVER=https://binqry.github.io/index/
+# With Index Server which defaults to https://binqry.github.io/index/
+binq mdbook -d path/to/bin
 export BINQ_BIN_DIR=path/to/bin
 binq jq@1.6
+## Specify server address
+binq -s https://your-index-server/ mdbook@0.4.1
+export BINQ_SERVER="https://your-index-server/"
+binq jq
 ```
 
 [Index Server](#binq-index-server) serves meta data of downloadable items by **binq**.  

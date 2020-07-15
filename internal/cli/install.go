@@ -61,10 +61,15 @@ Examples:
   {{.prog}} {{.name}} -t https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 \
     -d path/to/bin -f jq
 
-  # With index server
-  {{.prog}} {{.name}} -s https://binqry.github.io/index peco -d path/to/bin
-  export BINQ_SERVER=https://binqry.github.io/index
-  {{.prog}} jq@1.6 -d path/to/bin -f jq
+  # With index server which defaults to https://binqry.github.io/index/
+  {{.prog}} {{.name}} peco -d path/to/bin
+  export BINQ_BIN_DIR=path/to/bin
+  {{.prog}} jq@1.6
+
+  # Specify index server
+  binq -s https://your-index-server/ peco@0.5.7
+  export BINQ_SERVER="https://your-index-server/"
+  binq jq
 
 Options:
 `

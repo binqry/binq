@@ -1,3 +1,13 @@
+## 0.7.1 (2020-07-15)
+
+Feature / Change: ([#10](https://github.com/binqry/binq/pull/10))
+
+- - (client, CLI/install) Set default index server to https://binqry.github.io/index/
+
+Bug Fix: ([#10](https://github.com/binqry/binq/pull/10))
+
+- (CLI/modify) Can't move file to new path when directory doesn't exist
+
 ## 0.7.0 (2020-07-13)
 
 Change:
