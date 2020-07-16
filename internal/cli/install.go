@@ -98,6 +98,7 @@ Available Commands:
   register           # Register item JSON into Local Index Dataset
   modify             # Modify item properties on Local Index
   deregister         # Deregister item from Local Index Dataset
+  self-upgrade       # Upgrade {{.prog}} binary itself
   version            # Show {{.prog}} version
 
 Run "{{.prog}} COMMAND -h|--help" to see usage of each command.

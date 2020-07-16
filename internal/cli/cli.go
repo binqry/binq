@@ -73,6 +73,10 @@ func (c *CLI) Run(args []string) (exit int) {
 		deregistrar := newDeregisterCmd(common)
 		deregistrar.name = "deregister"
 		return deregistrar.run(args[2:])
+	case "self-upgrade":
+		upgrader := newSelfUpgradeCmd(common, args[0])
+		upgrader.name = "self-upgrade"
+		return upgrader.run(args[2:])
 	case "version":
 		fmt.Fprintf(c.OutStream, "Version: %s\n", binq.Version)
 		return exitOK

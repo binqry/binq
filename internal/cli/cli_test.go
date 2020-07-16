@@ -202,6 +202,11 @@ func buildTestRunAllCases(prog string) []testCaseRun {
 			args: []string{"deregister", "invalid-index-filename.json", "no-such-item"},
 			exit: exitNG, outStr: "", errStr: "Error! INDEX JSON filename must be \"index.json\".",
 		},
+
+		// self-upgrade
+		{args: []string{"self-upgrade", "--help"}, exit: exitOK, outStr: "", errStr: commands["self-upgrade"].helpText},
+		{args: []string{"self-upgrade", invalidFlg}, exit: exitNG, outStr: "", errStr: flagError},
+		{args: []string{"self-upgrade"}, exit: exitOK, outStr: "", errStr: "No need to upgrade"},
 	}
 }
 
@@ -251,6 +256,11 @@ Usage:`, prog)}
 
 	info["deregister"] = testCommandInfo{fmt.Sprintf(`Summary:
   Deregister an Item from Local %s Index Dataset.
+
+Usage:`, prog)}
+
+	info["self-upgrade"] = testCommandInfo{fmt.Sprintf(`Summary:
+  Upgrade %s binary itself.
 
 Usage:`, prog)}
 	return info
