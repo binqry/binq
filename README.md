@@ -58,14 +58,15 @@ binq [install] [-t|--target] SOURCE[@VERSION] \
   [GENERAL_OPTIONS]
 
 # Other Commands
-binq index       # List Items on Index Server
-binq new         # Create Item JSON for Index Server
-binq revise      # Add/Edit/Delete a version in Item JSON
-binq verify      # Verify checksum of a version in item JSON
-binq register    # Register item JSON into Local Index Dataset
-binq modify      # Modify item properties on Local Index
-binq deregister  # Deregister item from Local Index Dataset
-binq version     # Show binq version
+binq index         # List Items on Index Server
+binq new           # Create Item JSON for Index Server
+binq revise        # Add/Edit/Delete a version in Item JSON
+binq verify        # Verify checksum of a version in item JSON
+binq register      # Register item JSON into Local Index Dataset
+binq modify        # Modify item properties on Local Index
+binq deregister    # Deregister item from Local Index Dataset
+binq self-upgrade  # Upgrade binq binary itself
+binq version       # Show binq version
 
 # Show help
 binq [COMMAND] -h|--help

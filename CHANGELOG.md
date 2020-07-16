@@ -1,3 +1,13 @@
+## 0.8.0 (2020-07-16)
+
+Feature: ([#12](https://github.com/binqry/binq/pull/12))
+
+- (CLI) Add `self-upgrade` subcommand to upgrade the running program itself
+
+Other:
+
+- Add script to install the latest binary of binq
+
 ## 0.7.2 (2020-07-16)
 
 Feature: ([#11](https://github.com/binqry/binq/pull/11))
