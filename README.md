@@ -31,16 +31,10 @@ brew install binq
 Download latest binary from [GitHub Releases](https://github.com/binqry/binq/releases)
 and put it under one directory in `$PATH` entries.
 
-Typical commands to achieve this are following:
+The following script detects your OS and downloads the latest binq binary into your current directory:
 
 ```sh
-bin=/usr/local/bin  # Change to your favorite path
-version=0.7.2       # Make sure this is the latest
-os=darwin           # or "linux" is supported
-tmpfile=$(mktemp)
-curl -Lo $tmpfile "https://github.com/binqry/binq/releases/download/v${version}/binq_${version}_${os}_amd64.zip"
-unzip -d $bin $tmpfile
-rm $tmpfile
+curl -s "https://raw.githubusercontent.com/binqry/binq/master/get-binq.sh" | bash
 ```
 
 ## go get
