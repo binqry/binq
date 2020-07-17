@@ -1,7 +1,11 @@
 // Package install implements installation functionality of binq.
 package install
 
-import "errors"
+import (
+	"errors"
+	"regexp"
+	"runtime"
+)
 
 type Mode int
 
@@ -13,3 +17,8 @@ const (
 )
 
 var ErrVersionNotNewerThanThreshold = errors.New("Item version is not newer than given threshold")
+
+var (
+	isWindows = runtime.GOOS == "windows"
+	winRegExe = regexp.MustCompile(`^[\w\-]+\.exe$`)
+)

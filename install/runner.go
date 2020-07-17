@@ -184,7 +184,7 @@ func (r *Runner) locate() (err error) {
 		if problem != nil || info.IsDir() {
 			return problem
 		}
-		if isExecutable(info.Mode()) {
+		if isExecutable(info) {
 			var dest string
 			destFile := r.renameFileBySchema(info.Name())
 			if destFile != "" {
@@ -238,7 +238,9 @@ func (r *Runner) renameFileBySchema(orig string) (tobe string) {
 	return tobe
 }
 
-// TODO: Support Windows
-func isExecutable(mode os.FileMode) bool {
-	return mode&0111 != 0
+func isExecutable(info os.FileInfo) bool {
+	if isWindows {
+		return winRegExe.MatchString(info.Name())
+	}
+	return info.Mode()&0111 != 0
 }
