@@ -17,7 +17,7 @@ https://binqry.github.io/
 
 # System Requirements
 
-Pre-built binaries are available for macOS and Linux with x86-64 CPU architecture.
+Pre-built binaries are available for Windows, macOS and Linux with x86-64 CPU architecture.
 
 **binq** is logically supposed to work on any machine for which Go can compile codes.
 
@@ -34,7 +34,7 @@ Description for each method follows.
 ## Homebrew (Linuxbrew)
 
 ```sh
-brew tap progrhyme/taps
+brew tap progrhyme/tap
 brew install binq
 ```
 
