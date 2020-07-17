@@ -47,7 +47,7 @@ func (cmd *indexCmd) usage() {
   List items on <<.prog>> index server.
 
 Usage:
-  <<.prog>> <<.name>> [-s|--server SERVER] [GENERAL_OPTIONS]
+  <<.prog>> <<.name>> [-s|--server SERVER] [-o|--output FORMAT] [GENERAL_OPTIONS]
 
 Options:
 `

@@ -54,7 +54,7 @@ func (cmd *selfUpgradeCmd) usage() {
   Upgrade {{.prog}} binary itself.
 
 Usage:
-  {{.prog}} {{.name}} [GENERAL_OPTIONS]
+  {{.prog}} {{.name}} [OPTIONS] [GENERAL_OPTIONS]
 
 Options:
 `

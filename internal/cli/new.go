@@ -41,7 +41,7 @@ func newCreateCmd(common *commonCmd) (self *createCmd) {
 
 func (cmd *createCmd) usage() {
 	const help = `Summary:
-  Generate a template Item JSON for <<.prog>>.
+  Generate a template Item Manifest JSON for <<.prog>>.
 
 Usage:
   <<.prog>> <<.name>> URL_FORMAT [-v|--version VERSION] [-f|--file OUTPUT_FILE] \

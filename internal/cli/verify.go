@@ -59,7 +59,7 @@ func newVerifyCmd(common *commonCmd) (self *verifyCmd) {
 
 func (cmd *verifyCmd) usage() {
 	const help = `Summary:
-  Download a specified version in <<.prog>> Item JSON and Verify its checksum.
+  Download a specified version in <<.prog>> Item Manifest JSON and Verify its checksum.
   And update the checksum when needed.
 
 Usage:

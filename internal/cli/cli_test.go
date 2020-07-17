@@ -229,17 +229,17 @@ Syntax:`}
 Usage:`}
 
 	info["new"] = testCommandInfo{fmt.Sprintf(`Summary:
-  Generate a template Item JSON for %s.
+  Generate a template Item Manifest JSON for %s.
 
 Usage:`, prog)}
 
 	info["revise"] = testCommandInfo{fmt.Sprintf(`Summary:
-  Revise a version in Item JSON for %s.
+  Revise a version in Item Manifest JSON for %s.
 
 Usage:`, prog)}
 
 	info["verify"] = testCommandInfo{fmt.Sprintf(`Summary:
-  Download a specified version in %s Item JSON and Verify its checksum.
+  Download a specified version in %s Item Manifest JSON and Verify its checksum.
   And update the checksum when needed.
 
 Usage:`, prog)}

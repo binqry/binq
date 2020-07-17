@@ -52,7 +52,7 @@ func newReviseCmd(common *commonCmd) (self *reviseCmd) {
 
 func (cmd *reviseCmd) usage() {
 	const help = `Summary:
-  Revise a version in Item JSON for <<.prog>>.
+  Revise a version in Item Manifest JSON for <<.prog>>.
 
 Usage:
   # Add or Update Version

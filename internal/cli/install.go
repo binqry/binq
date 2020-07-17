@@ -90,14 +90,14 @@ Usage:
   {{.prog}} -h|--help
 
 Available Commands:
-  install (Default)  # Install binary or archive item
+  install (Default)  # Install binary or archive Item
   index              # List Items on Index Server
-  new                # Create item JSON for Index Server
-  revise             # Add/Edit/Delete a version in item JSON
-  verify             # Verify checksum of a version in item JSON
-  register           # Register item JSON into Local Index Dataset
-  modify             # Modify item properties on Local Index
-  deregister         # Deregister item from Local Index Dataset
+  new                # Create Item Manifest
+  revise             # Add/Edit/Delete a version in Item Manifest
+  verify             # Verify checksum of a version in Item Manifest
+  register           # Register or Update Item Manifest onto Local Index Dataset
+  modify             # Modify Item properties on Local Index Dataset
+  deregister         # Deregister Item from Local Index
   self-upgrade       # Upgrade {{.prog}} binary itself
   version            # Show {{.prog}} version
 
