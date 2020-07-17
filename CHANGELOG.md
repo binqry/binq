@@ -1,3 +1,13 @@
+## 0.8.1 (2020-07-18)
+
+Enhance: ([#13](https://github.com/binqry/binq/pull/13))
+
+- (install) Support Windows OS
+
+Other:
+
+- (doc) Update README and help text according to new documentation site https://binqry.github.io/
+
 ## 0.8.0 (2020-07-16)
 
 Feature: ([#12](https://github.com/binqry/binq/pull/12))

@@ -21,10 +21,6 @@ Pre-built binaries are available for macOS and Linux with x86-64 CPU architectur
 
 **binq** is logically supposed to work on any machine for which Go can compile codes.
 
-Known issues:
-
-- Installation process on Windows may not work.
-
 # Install
 
 Choose one of below methods:
