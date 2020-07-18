@@ -22,3 +22,13 @@ snapshot:
   name_template: "{{ .Tag }}-next"
 changelog:
   skip: true
+brews:
+- tap:
+    owner: progrhyme
+    name: homebrew-tap
+    token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+  folder: Formula
+  homepage: https://binqry.github.io/
+  description: A light-weight software installer written in Golang
+  test: |
+    system "#{bin}/binq", 'version'
