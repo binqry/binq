@@ -12,15 +12,15 @@ if [[ -z "$VERSION" ]]; then
 fi
 
 awk -v version="$VERSION" '
-  BEGIN { current = 0 }
+  BEGIN { st = 0 }
   {
-    if (current == 0 && match($0, "^## " version)) {
-      current = 1
-      print $0
-    } else if (current == 1 && /^##/) {
-      current = -1
-    } else if (current == 1) {
-      print $0
+    if (st == 0 && match($0, "^## " version)) {
+      st = 1
+      print
+    } else if (st == 1 && /^##/) {
+      exit
+    } else if (st == 1) {
+      print
     }
   }
 ' CHANGELOG.md
