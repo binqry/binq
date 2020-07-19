@@ -3,12 +3,13 @@ package cli
 import (
 	"fmt"
 	"io"
+	"os"
 	"strings"
 
 	"github.com/binqry/binq/internal/erron"
 	"github.com/gookit/color"
+	"github.com/mattn/go-isatty"
 	"github.com/pmezard/go-difflib/difflib"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 type diffArgs struct {
@@ -32,7 +33,7 @@ func getDiff(args diffArgs) (diff string, err error) {
 }
 
 func fprintDiff(out io.Writer, diff string) {
-	if terminal.IsTerminal(1) {
+	if isatty.IsTerminal(os.Stdout.Fd()) {
 		fmt.Fprintln(out, colorizeDiff(diff))
 	} else {
 		fmt.Fprintln(out, diff)

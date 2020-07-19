@@ -10,8 +10,8 @@ import (
 
 	"github.com/binqry/binq/internal/erron"
 	"github.com/binqry/binq/schema"
+	"github.com/mattn/go-isatty"
 	"github.com/spf13/pflag"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 // For index manipulator commands: "register", "modify", "deregister"
@@ -109,7 +109,7 @@ func writeNewIndex(cmd indiceRunner, idx *schema.Index, fileIndex string) (err e
 	if !yes {
 		fprintDiff(cmd.getOuts(), diff)
 	}
-	if terminal.IsTerminal(0) && !yes {
+	if isatty.IsTerminal(os.Stdin.Fd()) && !yes {
 		fmt.Fprintf(cmd.getErrs(), "Write %s. Okay? (Y/n) ", fileIndex)
 		stdin := bufio.NewScanner(os.Stdin)
 		stdin.Scan()

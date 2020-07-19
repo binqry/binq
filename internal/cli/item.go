@@ -9,7 +9,7 @@ import (
 
 	"github.com/binqry/binq/internal/erron"
 	"github.com/binqry/binq/schema/item"
-	"golang.org/x/crypto/ssh/terminal"
+	"github.com/mattn/go-isatty"
 )
 
 func readAndDecodeItemJSONFile(file string) (raw []byte, obj *item.Item, err error) {
@@ -50,7 +50,7 @@ func updateItemJSON(cmd confirmRunner, obj *item.Item, file string, prev []byte)
 	if !*cmd.getConfirmOpts().getYes() {
 		fprintDiff(cmd.getOuts(), diff)
 	}
-	if terminal.IsTerminal(0) && !*cmd.getConfirmOpts().getYes() {
+	if isatty.IsTerminal(os.Stdin.Fd()) && !*cmd.getConfirmOpts().getYes() {
 		fmt.Fprintf(cmd.getErrs(), "Overwrite %s? (Y/n) ", file)
 		stdin := bufio.NewScanner(os.Stdin)
 		stdin.Scan()
